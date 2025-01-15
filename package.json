@@ -1,0 +1,21 @@
+{
+  "name": "bot_inaters",
+  "version": "1.0.0",
+  "main": "main.js",
+  "scripts": {
+    "test": "node --watch .",
+    "start": "node .",
+    "populate": "copy C:\\Users\\user\\(❁´◡`❁)\\.env .\\.env"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "bot_inaters": "file:",
+    "dotenv": "^16.4.7",
+    "qrcode-terminal": "^0.12.0",
+    "react": "^18.3.1",
+    "whatsapp-web.js": "^1.26.1-alpha.3"
+  }
+}
