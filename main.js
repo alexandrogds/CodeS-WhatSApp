@@ -95,7 +95,7 @@ async function Comandos(message) {
     } else if (!process.env.DEBUG) {
         group = process.env.ARENASC
     }
-    if (message.from === group) {
+    if (message.from === group && message.body != '.tag') {
         let winner
         let dataHoraUser = {  // Create the object
 			data_hora: message.timestamp,
@@ -267,6 +267,18 @@ async function Comandos(message) {
         console.log(typeof table)
         await client.sendMessage(group, table)
         console.log('Mensagem enviada.')
+    } else if (message.author == '559581042843@c.us' && message.body.toLowerCase() === process.env.PREFIX + 'tag'.toLowerCase()) {
+        const chat = await message.getChat();
+        let mentions = [];
+        let pessoas = ''
+        for (let participantes of chat.participants) {
+            mentions.push(`${participantes.id.user}@c.us`);
+            pessoas += `|@${participantes.id.user} `;
+            console.log(participantes);
+            break
+        }
+        // await chat.sendMessage(pessoas, {mentions});
+        await chat.sendMessage('Leiam a mensagem acima.', {mentions});
     } else if (message.body.toLowerCase() === process.env.PREFIX + 'Menu'.toLowerCase()) {
         if (!message.author) {
             return
@@ -332,7 +344,7 @@ async function Comandos(message) {
     }
 }
 
-let lista_comandos = ['Dg', 'Menu'].map(cmd => process.env.PREFIX + cmd)
+let lista_comandos = ['Dg', 'Menu', 'tag'].map(cmd => process.env.PREFIX + cmd)
 
 // Spam handling
 let lista_spam = [];
