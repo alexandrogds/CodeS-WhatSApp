@@ -111,7 +111,7 @@ async function Comandos(message) {
         // console.log(`message.isGroupMsg:`, message.isGroupMsg)
         // console.log(`message.isMedia:`, message.isMedia)
         // console.log(`message.isNotification:`, message.isNotification)
-        process.stdout.write(`.bool: ${message.from === process.env.TEST_GROUP}`);
+        process.stdout.write(`\n.bool: ${message.from === process.env.TEST_GROUP}`);
         process.stdout.write(new Date().toLocaleTimeString());
         // process.stdout.write(' ', typeof String.raw`${message.body}`)
         
