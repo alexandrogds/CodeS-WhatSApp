@@ -90,12 +90,31 @@ initializeData()
 async function Comandos(message) {
     /*--- Comandos Ajuda ---*/
     let group
+    let qwe
     if (process.env.DEBUG) {
         group = process.env.TEST_GROUP
+        qwe = 'TEST_GROUP'
     } else if (!process.env.DEBUG) {
         group = process.env.ARENASC
+        qwe = 'ARENASC'
     }
     if (message.from === group && message.body != '.tag') {
+        console.log(qwe)
+        console.log(group)
+        console.log(`message.body:`, message.body)
+        console.log(`message.from:`, message.from)
+        console.log(`message.to:`, message.to)
+        console.log(`message.fromMe:`, message.fromMe)
+        console.log(`message.author:`, message.author)
+        console.log(`message.timestamp:`, message.timestamp)
+        console.log(`message.isGif:`, message.isGif)
+        // console.log(`message.isGroupMsg:`, message.isGroupMsg)
+        // console.log(`message.isMedia:`, message.isMedia)
+        // console.log(`message.isNotification:`, message.isNotification)
+        process.stdout.write(`.bool: ${message.from === process.env.TEST_GROUP}`);
+        process.stdout.write(new Date().toLocaleTimeString());
+        // process.stdout.write(' ', typeof String.raw`${message.body}`)
+        
         let winner
         let dataHoraUser = {  // Create the object
 			data_hora: message.timestamp,
@@ -353,7 +372,8 @@ let flag_spam = 0;
 // Bot, em loop, lendo as mensagens
 client.on('message_create', async message => {
 
-    if (message.from === process.env.TEST_GROUP) {
+    if ( message.from === process.env.TEST_GROUP) {
+        console.log('TEST_GROUP')
         console.log(process.env.TEST_GROUP)
         console.log(`message.body:`, message.body)
         console.log(`message.from:`, message.from)
@@ -369,6 +389,7 @@ client.on('message_create', async message => {
         process.stdout.write(new Date().toLocaleTimeString());
         // process.stdout.write(' ', typeof String.raw`${message.body}`)
     }
+    
     process.stdout.write('.');
 
     if ([...lista_comandos].some(cmd => cmd.toLowerCase() === String.raw`${message.body}`.toLowerCase())) {
@@ -384,7 +405,7 @@ client.on('message_create', async message => {
         if(!(Math.abs(lista_spam[1] - lista_spam[0]) < 3)){
             await Comandos(message);
         }
-    } else if ( message.from === process.env.TEST_GROUP ) {
+    } else if ( message.from === process.env.TEST_GROUP || message.from === process.env.ARENASC) {
         await Comandos(message);
     }
 });
