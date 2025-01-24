@@ -1,9 +1,12 @@
+const myfs = require('./myfs')
+
 // error.js
-function error(msg, numbers, dataHoraUser, code, info = '') {
-	const timestamp = dataHoraUser ? dataHoraUser.data_hora : 'Unknown Timestamp'; // Handle potential null value
-	const user = dataHoraUser ? dataHoraUser.usuario : 'Unknown User';
-	console.error(`Error ${code}:`, msg, numbers, timestamp, user, info);
-	// ... rest of error handling logic ...
+function error(message, code, info) {
+	const timestamp = new Date().toLocaleTimeString()
+	const data = new Date().toLocaleDateString()
+	const dt = data + ' ' + timestamp
+	let out = dt + '_' + message.replace('/\n/g', '/n') + 'code=' + code + 'info=' + info
+	myfs.appendFile(String.raw`C:\Users\user\OneDrive\RPG's\Chapéus De Palha _ Alex Thierry\bot.log`, out)
 }
 
 module.exports = error;

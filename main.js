@@ -40,9 +40,8 @@ let dia = null;
 let mes = null;
 let ano = null;
 // let nicks = []; // Initialize nicks array
-let _nicks = []; // Initialize _nicks array
+let nickSOfMessage = []; // Initialize nickSOfMessage array
 let flag = '';
-let winner = null
 
 // Create a new client instance
 const client = new Client({ authStrategy: new LocalAuth() });
@@ -97,6 +96,7 @@ async function Comandos(message) {
         group = process.env.ARENASC
     }
     if (message.from === group) {
+        let winner
         let dataHoraUser = {  // Create the object
 			data_hora: message.timestamp,
 			usuario: message.author || message.from // Use author if available, otherwise from
@@ -108,17 +108,41 @@ async function Comandos(message) {
         const numbers = message.body.match(regex) || [];
         process.stdout.write(`Extracted Numbers: ${numbers}.`);
     
-        const linhas = message.body.split(/\r?\n/);
-        const _nicks = await getNicksOfMessage(message);
-		const nick_count = _nicks.length; // Get nick_count here
+        const nickSOfMessage = await getNicksOfMessage(message);
+		const nick_count = nickSOfMessage.length; // Get nick_count here
 
         if (numbers.length < 4) {
+            return
         } else if ( nick_count == 2) {
-            const resultados = calcularProximidade(linhas, _nicks)
-            if (resultados.length === 0) {
-                error(mensagem_anterior, numbers, '23');
+            const resultados = calcularProximidade(message.body, nickSOfMessage)
+            console.log(resultados)
+            // let allStatuS = resultados[nickSOfMessage[0]]['status'].concat(resultados[nickSOfMessage[1]]['status'])
+            // let resultsProcess = allStatuS.reduce((map) => { if (map.has(0)) { map.set(0, map.get(0) + 1); } else { map.set(0, 1); } return map; }, new Map())
+            if (resultados.length == 0) {
+            // if (resultados.length != 2) {
+                error(message.body, '23', 'PARECE HAVER MAIS QUE 2 OU MENOS QUE 2 DE LINHAS QUE REPRESENTAM O STATUS DE LIFE E CHAKRA');
                 return null; // Or handle the error differently
-            } else if ((resultados[0][1].length !== 2 || resultados[1][1].length !== 2) && flag != '') {
+            } 
+            // fazer na mao todas as possibilidades de 0 à 3 daria 0,0 0,1 0,2 0,3 1,1 1,2 1,3 2,2 2,3 3,3
+            // else if ( resultados[nickSOfMessage[0]]['status'].length == 2 ) {
+            //     if (resultados[nickSOfMessage[1]]['status'].length == 2) {
+            //         if (resultados[nickSOfMessage[0]]['status'][0] == 2) {
+
+            //         }
+            //     }
+            // }
+
+
+
+
+
+
+
+
+
+
+
+            else if ((resultados[0][1].length !== 2 || resultados[1][1].length !== 2) && flag != '') {
                 if (resultados[0][1].length === 3) {
                     if (resultados[0][1].filter(x => x === Math.min(...resultados[0][1])).length === 1) { // Count occurrences of min value
                         const minIndex = resultados[0][1].indexOf(Math.min(...resultados[0][1]));
@@ -127,10 +151,19 @@ async function Comandos(message) {
                         } else if (minIndex === 1) {
                             flag += '0 && vida;';
                         } else {
-                            error(mensagem_anterior, numbers, '30', `\nRESULTADOS = ${JSON.stringify(resultados)}`); // Use JSON.stringify
+                            error(message.body, '555111', `efeito sobre vida deslocado`); // Use JSON.stringify
                             return null; // Or handle error as needed
                         }
                     }
+                } else if (resultados[0][1].length === 4) {
+                    if (resultados[0][1][1] != 0 && resultados[0][1][3] != 0) {
+                        flag += '0 && mana; 0 && vida;';
+                    } else {
+                        error(message.body, '000011', `ESSA LUTA TEM SIMULTANEAMENTE DOIS EFEITOS SECUNDARIOS JUNTOS AO LIFE E CHAKRA`); // Use JSON.stringify
+                    }
+                } else {
+                    error(message.body, '666111', `ESSA LUTA TEM SIMULTANEAMENTE DOIS EFEITOS SECUNDARIOS JUNTOS AO LIFE E CHAKRA`); // Use JSON.stringify
+                    return
                 }
         
                 if (resultados[1][1].length === 3) {
@@ -141,20 +174,25 @@ async function Comandos(message) {
                         } else if (minIndex === 1) {
                             flag += '1 && vida;';
                         } else {
-                            error(mensagem_anterior, numbers, '31', `\nRESULTADOS = ${JSON.stringify(resultados)}`);
+                            error(message.body, '888811', `efeito sobre vida deslocado`); // Use JSON.stringify
                             return null;// Or handle error as needed
                         }
                     }
+                }else if(resultados[1][1].length === 4){
+                    // TODO
+                } else {
+                    error(message.body, '777111', `ESSA LUTA TEM SIMULTANEAMENTE DOIS EFEITOS SECUNDARIOS JUNTOS AO LIFE E CHAKRA`); // Use JSON.stringify
+                    return
                 }
             } else if (resultados[0][1] && resultados[1][1] && resultados[0][1].join("") === resultados[1][1].join("") && (resultados[0][1].includes(0) || resultados[1][1].includes(0))) {
-                error(message.body, numbers, data_hora_e_user_da_mensagem_anterior, '22', 'TRATAR PARA PEGAR A TABELA ANTERIOR PARA DECIDIR QUEM VENCE.\nRESULTADOS = ' + JSON.stringify(resultados));
+                error(message.body, '22', 'TRATAR PARA PEGAR A TABELA ANTERIOR PARA DECIDIR QUEM VENCE.\nRESULTADOS = ' + JSON.stringify(resultados));
             } else if (flag && resultados[0][1] && resultados[1][1] && resultados[0][1][0] === 0 && resultados[1][1][0] === 0) {
                 console.log('ENTROU<-123')
                 const a99 = flag.split(';').filter(x => x !== '');
                 if (a99.length === 1) {
-                    winner = handleOneFlag(a99, resultados, telefones, juizes_e_os_players_da_luta, quem_enviou_a_mensagem_anterior__juiz, nicks_e_seus_telefones, data_hora_da_ultima_tabela, dia, mes, ano, nicks, data_hora_objeto, dia_semana_numero, aux_dia_semana_numero, nicks_e_suas_quantidade_de_vitorias, datas_nicks_e_suas_quantidade_de_vitorias, meses_e_nicks_com_suas_quantidade_de_vitorias, periodo_mensal, periodo_semanal, _nicks, registrarPontosHelper); // Pass necessary variables
+                    winner = handleOneFlag(a99, resultados, telefones, juizes_e_os_players_da_luta, quem_enviou_a_mensagem_anterior__juiz, nicks_e_seus_telefones, data_hora_da_ultima_tabela, dia, mes, ano, nicks, data_hora_objeto, dia_semana_numero, aux_dia_semana_numero, nicks_e_suas_quantidade_de_vitorias, datas_nicks_e_suas_quantidade_de_vitorias, meses_e_nicks_com_suas_quantidade_de_vitorias, periodo_mensal, periodo_semanal, nickSOfMessage, registrarPontosHelper); // Pass necessary variables
                 } else if (a99.length === 2) {
-                    winner = handleTwoFlags(a99, resultados, telefones, juizes_e_os_players_da_luta, quem_enviou_a_mensagem_anterior__juiz, nicks_e_seus_telefones, data_hora_da_ultima_tabela, dia, mes, ano, nicks, data_hora_objeto, dia_semana_numero, aux_dia_semana_numero, nicks_e_suas_quantidade_de_vitorias, datas_nicks_e_suas_quantidade_de_vitorias, meses_e_nicks_com_suas_quantidade_de_vitorias, periodo_mensal, periodo_semanal, _nicks, registrarPontosHelper); // Pass necessary variables
+                    winner = handleTwoFlags(a99, resultados, telefones, juizes_e_os_players_da_luta, quem_enviou_a_mensagem_anterior__juiz, nicks_e_seus_telefones, data_hora_da_ultima_tabela, dia, mes, ano, nicks, data_hora_objeto, dia_semana_numero, aux_dia_semana_numero, nicks_e_suas_quantidade_de_vitorias, datas_nicks_e_suas_quantidade_de_vitorias, meses_e_nicks_com_suas_quantidade_de_vitorias, periodo_mensal, periodo_semanal, nickSOfMessage, registrarPontosHelper); // Pass necessary variables
                 }
                 flag = null; // Reset flag
             }  else if (resultados[0][1] && resultados[1][1]) {
@@ -178,10 +216,11 @@ async function Comandos(message) {
                 }
             }
         } else if (nick_count === 1) {
+            error(message.body, '0', `Pegar o nick da placa abaixo diferente do nick: ${aux_nick}`)
             console.error("\n\nID=0");
             console.error(`\nPegar o nick da placa abaixo diferente do nick: ${aux_nick}\n${message.body}\n`);//verificar se aux_nick existe
             // Handle the error as needed (e.g., send a message, return) – don't just exit()
-            
+
             return;
         
         } else if (nick_count === 0 && message.body && contarUnicodeEmojis(message.body) < 50) {
@@ -192,7 +231,8 @@ async function Comandos(message) {
             console.error(`\nPegar os dois nicks da placa abaixo: \n\n${message.body}\n`);
             // Handle the error (e.g., send a message, return) – don't just exit()
         
-        } else if (nick_count === 3 && _nicks.some(nick => _nicks.filter(n => n === nick).length > 1)) {
+        } else if (nick_count === 3 && nickSOfMessage.some(nick => nickSOfMessage.filter(n => n === nick).length > 1)) {
+            error(message.body, '10', "Pode haver duas simplificações de nicks iguais. " + "Confira o arquivo de nicks.")
             console.error("\n\nID=10");
             console.error("Pode haver duas simplificações de nicks iguais.");
             console.error("Confira o arquivo de nicks.");
