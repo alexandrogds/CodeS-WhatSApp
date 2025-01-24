@@ -60,7 +60,7 @@ client.on('qr', (qr) => {
 
 async function readDragonMembers() {
     try {
-        const content = await readFile('C:/Users/user/OneDrive/RPGs/Zarcovi/membros dragon gakure.md', 'utf-8');
+        const content = await readFile(`C:/Users/user/OneDrive/RPG's/Zarcovi/membros dragon gakure.md`, 'utf-8');
         return content;
     } catch (error) {
         console.error('Error reading Dragon Gakure members file:', error);
@@ -181,6 +181,7 @@ async function Comandos(message) {
             console.error("\n\nID=0");
             console.error(`\nPegar o nick da placa abaixo diferente do nick: ${aux_nick}\n${message.body}\n`);//verificar se aux_nick existe
             // Handle the error as needed (e.g., send a message, return) – don't just exit()
+            
             return;
         
         } else if (nick_count === 0 && message.body && contarUnicodeEmojis(message.body) < 50) {
@@ -197,6 +198,10 @@ async function Comandos(message) {
             console.error("Confira o arquivo de nicks.");
             console.error(`\nMENSAGEM:\n\n${message.body}\n`);
             // Handle the error as needed
+            return
+        }
+
+        if (winner == null) {
             return
         }
 
