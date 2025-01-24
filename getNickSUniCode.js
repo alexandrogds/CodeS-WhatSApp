@@ -1,13 +1,17 @@
-const { readFile } = require('./fs2.js')
+const { readFile } = require('./myfs.js')
 
 async function getNickSUniCode() {
-    const pathNickSUniCode = "C:\\Users\\user\\OneDrive\\RPGs\\Chap�us De Palha - Alex Thierry\\Membros (Mar, Patentes E N�meros De Celular).md";
+    const pathNickSUniCode = String.raw`C:\Users\user\OneDrive\RPG's\Chapéus De Palha _ Alex Thierry\Membros (Mar, Patentes E Números De Celular).md`;
+    const bufferNickSUniCode = Buffer.from(pathNickSUniCode, 'utf-8');
     try {
-        const content = await readFile(pathNickSUniCode, 'utf-8'); // Specify UTF-8 encoding
+        const content = await readFile(bufferNickSUniCode, 'utf-8'); // Specify UTF-8 encoding
         const lines = content.split('\n');
         const result = lines.map(line => {
-            const words = line.trim().split(' '); // Trim to remove leading/trailing whitespace
-            return words.length > 1 ? words[1] : words[0]; //default to "0" if no second word
+            if (line.trim() == '') {
+                return ''
+            }
+            const result = line.match(/[^\d+\r-]+/g).join('');
+            return result.trim()
         });
         return result;
     } catch (error) {

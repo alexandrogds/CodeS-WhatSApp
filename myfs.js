@@ -1,6 +1,6 @@
 const fs = require('fs/promises'); 
 
-async function appendToFile(path, data) {  // Make the function async
+async function appendFile(path, data) {  // Make the function async
 	try {
 		await fs.appendFile(path, data + '\n', 'utf-8'); // Add newline and specify UTF-8
 		// Log success (optional)
@@ -14,12 +14,24 @@ async function appendToFile(path, data) {  // Make the function async
 
 async function readFile(path) {
 	try {
+		console.log('iniciando leitura de um arquivo')
 		const content = await fs.readFile(path, 'utf-8');
+		console.log('arquivo lido, retornando content')
 		return content;
 	} catch (error) {
-		console.error('Error reading Dragon Gakure members file:', error);
+		console.error('Error reading file:', error);
 		return null;
 	}
 }
 
-module.exports = { appendToFile, readFile };
+async function writeFile(path, data) {
+	try {
+		await fs.writeFile(path, data, 'utf-8');
+		return true;
+	} catch (error) {
+		console.error('Error write file:', error);
+		return null;
+	}
+}
+
+module.exports = { appendFile, readFile, writeFile };

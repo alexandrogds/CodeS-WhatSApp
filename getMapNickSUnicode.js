@@ -8,19 +8,24 @@ async function mapearNickSUnicode() {
     const nickMap = {};
 
     nickS.forEach(nick => {
-        const nickUnicodeMatch = nickSUniCode.find(nickUnicode => {
-            const decodedNickUnicode = decodeURIComponent(escape(nickUnicode));
-            return decodedNickUnicode.includes(nick); // verifica se o nickUnicode cont�m o nick
-        });
+        if (nick != '') {
+            const nickUnicodeMatch = nickSUniCode.find(nickUnicode => {
+                // const decodedNickUnicode = decodeURIComponent(escape(nickUnicode));
+                // return decodedNickUnicode.includes(nick); // verifica se o nickUnicode cont�m o nick
+                return nickUnicode.toLowerCase().includes(nick.toLowerCase()); // verifica se o nickUnicode cont�m o nick
+            });
 
-        if (nickUnicodeMatch) {
+            if (nickUnicodeMatch) {
 
-            nickMap[nick] = nickUnicodeMatch;
+                nickMap[nick.toLowerCase()] = nickUnicodeMatch;
+            }
         }
     });
 
     console.log("Mapeamento de Nicks:", nickMap);
     return nickMap;
 }
+    
+
 
 module.exports = mapearNickSUnicode

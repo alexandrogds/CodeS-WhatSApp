@@ -1,31 +1,29 @@
 /*--- Sincronização do bot com o WhatsApp ---*/
 
 const qrcode = require('qrcode-terminal')
-const { Client, LocalAuth, MessageMedia } = require('whatsapp-web.js')
-// const * as fs = require('fs/promises'; // Correct const - you'll likely need other fs functions
 const dotenv = require('dotenv')
-
+const { Client, LocalAuth, MessageMedia } = require('whatsapp-web.js')
 const analyzeResults = require('./analyzeResults.js')
 const calcularProximidade = require('./calcularProximidade.js')
 const getNicksOfMessage = require('./getNicksOfMessage.js')
 const { registrar_pontos } = require('./registrarPontos.js') // Named const
 const registrarPontosHelper = require('./registrarPontosHelper.js')
 const error = require('./error.js')
-const getNicksAndTelefones = require('./getNicksAndTelefones.js')
+const getTelefoneS = require('./getTelefoneS.js')
 const contarUnicodeEmojis = require('./contarUnicodeEmojis.js')
 const { handleOneFlag, handleTwoFlags } = require('./fss.js') // const the functions
 const { processDataAndSave } = require('./processDataAndSave.js') // const the functions
-const { appendToFile, readFile } = require('./fs2.js') // const the functions
+const { appendFile, readFile, writeFile } = require('./myfs.js') // const the functions
 const generateTable = require('./generateTable.js')
 const determineWinner = require('./determineWinner.js')
-const winnersAndTheirFights = require('./getWinnersAndTheirFights.js')
+const getWinnersAndTheirFights = require('./getWinnersAndTheirFights.js')
 
-dotenv.config({ path: '../.env' });
+dotenv.config({ path: './.env' });
 
 // Initialize ALL global variables with appropriate default values.
 // It's crucial to initialize these outside the Comandos function
 // so that their values are not reset every time Comandos is called.
-let telefones = [];
+let phoneS
 let juizes_e_os_players_da_luta = {};
 let nicks_e_seus_telefones = [];
 let data_hora_da_ultima_tabela = null;
@@ -41,9 +39,10 @@ let data_hora_objeto = null;
 let dia = null;
 let mes = null;
 let ano = null;
-let nicks = []; // Initialize nicks array
+// let nicks = []; // Initialize nicks array
 let _nicks = []; // Initialize _nicks array
 let flag = '';
+let winner = null
 
 // Create a new client instance
 const client = new Client({ authStrategy: new LocalAuth() });
@@ -51,6 +50,7 @@ const client = new Client({ authStrategy: new LocalAuth() });
 // When the client is ready, run this code (only once)
 client.once('ready', () => {
     console.log('Client is ready!');
+    console.log(new Date().toLocaleTimeString());
 });
 
 // When the client received QR-Code
@@ -82,29 +82,7 @@ async function menuCLI() {
 
 // Function to initialize data (nicks, telefones, etc.)
 async function initializeData() {
-    const filePath = 'C:/Users/user/OneDrive/RPGs/Chapéus De Palha - Alex Thierry/nicks e telefones.md'; // Correct path
-    const nicksAndPhones = await getNicksAndTelefones(filePath);
-
-    telefones = Object.values(nicksAndPhones);
-    nicks_e_seus_telefones = Object.entries(nicksAndPhones);
-    nicks = Object.keys(nicksAndPhones); // Initialize the nicks array HERE
-
-    juizes_e_os_players_da_luta = {};
-    nicks_e_seus_telefones = [];
-    data_hora_da_ultima_tabela = null;
-    aux_dia_semana_numero = null;
-    nicks_e_suas_quantidade_de_vitorias = {};
-    datas_nicks_e_suas_quantidade_de_vitorias = {};
-    meses_e_nicks_com_suas_quantidade_de_vitorias = {};
-    periodo_mensal = null;
-    periodo_semanal = null;
-    dia_semana_numero = null;
-    quem_enviou_a_mensagem_anterior__juiz = null;
-    data_hora_objeto = null;
-    dia = null;
-    mes = null;
-    ano = null;
-    _nicks = []; // Initialize _nicks array
+    phoneS = await getTelefoneS();
 }
 
 initializeData()
@@ -112,18 +90,24 @@ initializeData()
 // Função principal que rege todos os comandos
 async function Comandos(message) {
     /*--- Comandos Ajuda ---*/
-    if (message.from === process.env.ARENASC) {
+    let group
+    if (process.env.DEBUG) {
+        group = process.env.TEST_GROUP
+    } else if (!process.env.DEBUG) {
+        group = process.env.ARENASC
+    }
+    if (message.from === group) {
         let dataHoraUser = {  // Create the object
 			data_hora: message.timestamp,
 			usuario: message.author || message.from // Use author if available, otherwise from
 		};
+        process.stdout.write('entrou1.');
         
         //Regular expression matching numbers with 1 to 3 digits not surrounded by other digits
         const regex = /(?<!\d)[0-9]{1,3}(?!\d)/g;
         const numbers = message.body.match(regex) || [];
+        process.stdout.write(`Extracted Numbers: ${numbers}.`);
     
-        console.log("Extracted Numbers:", numbers); // Log the extracted numbers
-
         const linhas = message.body.split(/\r?\n/);
         const _nicks = await getNicksOfMessage(message);
 		const nick_count = _nicks.length; // Get nick_count here
@@ -199,7 +183,7 @@ async function Comandos(message) {
             // Handle the error as needed (e.g., send a message, return) – don't just exit()
             return;
         
-        } else if (nick_count === 0 && message.body && contar_unicode_emojis(message.body) < 50) {
+        } else if (nick_count === 0 && message.body && contarUnicodeEmojis(message.body) < 50) {
             return
             console.error("\n\nID=2");
             console.error("numbers =", numbers);
@@ -216,30 +200,28 @@ async function Comandos(message) {
             return
         }
 
-        const nicksAndPhones = await getNicksAndTelefones(process.env.FILE_NICKS_AND_TELEFONES);
-        console.log(nicksAndPhones);
-
-        const nicks = Object.keys(nicksAndPhones); // Get all the nicks (keys of the object)
-        const telefones = Object.values(nicksAndPhones); // Get all the phone numbers (values of the object)
-        vencedor = nicks[_nicks.indexOf(vencedor)];
-
-        let pathWinnersArenaSC = process.env.FILEPATH_NICK_NUMBER_DATA_OF_NICK_VENCEDOR_ARENA_SC;
-
-        let winners = await readFile(pathWinnersArenaSC)
+        let winners = await readFile(process.env.WINNERS_ARENA_SC)
         winners = JSON.parse(winners)
+        console.log('winners = ', winners)
         const dataToAppend = {
-            vencedor: vencedor,
-            telefone: telefones[vencedor],
-            timestamp: message.timestamp,
-            autor: message.author || message.from
+            'winner': winner.toLowerCase(),
+            'phone': phoneS[winner.toLowerCase()],
+            'timestamp': message.timestamp,
+            'author': message.author || message.from
         };
+        console.log('dataToAppend = ', dataToAppend)
         winners.push(dataToAppend)
-        await appendToFile(pathWinnersArenaSC, JSON.stringify(winners, null, 2)); // Correctly call using await
+        console.log('winners = ', winners)
+        await writeFile(process.env.WINNERS_ARENA_SC, JSON.stringify(winners, null, 2)); // Correctly call using await
 
-        let winnersAndTheirFights = winnersAndTheirFights()
-        let table = generateTable(winnersAndTheirFights)
+        let winnersAndTheirFights = await getWinnersAndTheirFights(winners)
+        console.log(winnersAndTheirFights)
+        let table = await generateTable(winnersAndTheirFights)
 
-        await client.sendMessage(process.env.ARENASC, table);
+        console.log('Enviando mensagem.')
+        console.log(typeof table)
+        await client.sendMessage(group, table)
+        console.log('Mensagem enviada.')
     } else if (message.body.toLowerCase() === process.env.PREFIX + 'Menu'.toLowerCase()) {
         if (!message.author) {
             return
@@ -314,19 +296,25 @@ let flag_spam = 0;
 // Bot, em loop, lendo as mensagens
 client.on('message_create', async message => {
 
-    console.log(`message.body:`, message.body);
-    console.log(`message.from:`, message.from);
-    console.log(`message.to:`, message.to);
-    console.log(`message.fromMe:`, message.fromMe);
-    console.log(`message.author:`, message.author);
-    console.log(`message.timestamp:`, message.timestamp);
-    console.log(`message.isGif:`, message.isGif);
-    // console.log(`message.isGroupMsg:`, message.isGroupMsg);
-    // console.log(`message.isMedia:`, message.isMedia);
-    // console.log(`message.isNotification:`, message.isNotification);
-    console.log('\n')
+    if (message.from === process.env.TEST_GROUP) {
+        console.log(process.env.TEST_GROUP)
+        console.log(`message.body:`, message.body)
+        console.log(`message.from:`, message.from)
+        console.log(`message.to:`, message.to)
+        console.log(`message.fromMe:`, message.fromMe)
+        console.log(`message.author:`, message.author)
+        console.log(`message.timestamp:`, message.timestamp)
+        console.log(`message.isGif:`, message.isGif)
+        // console.log(`message.isGroupMsg:`, message.isGroupMsg)
+        // console.log(`message.isMedia:`, message.isMedia)
+        // console.log(`message.isNotification:`, message.isNotification)
+        process.stdout.write(`.bool: ${message.from === process.env.TEST_GROUP}`);
+        process.stdout.write(new Date().toLocaleTimeString());
+        // process.stdout.write(' ', typeof String.raw`${message.body}`)
+    }
+    process.stdout.write('.');
 
-    if ([...lista_comandos].some(cmd => cmd.toLowerCase() === message.body.toLowerCase())) {
+    if ([...lista_comandos].some(cmd => cmd.toLowerCase() === String.raw`${message.body}`.toLowerCase())) {
         let msg1 = message.timestamp;
         lista_spam[flag_spam] = msg1;
 
@@ -339,6 +327,8 @@ client.on('message_create', async message => {
         if(!(Math.abs(lista_spam[1] - lista_spam[0]) < 3)){
             await Comandos(message);
         }
+    } else if ( message.from === process.env.TEST_GROUP ) {
+        await Comandos(message);
     }
 });
 

@@ -1,6 +1,6 @@
 const fs = require('fs')
 
-function getNickS(filepath) {
+function getNickS() {
     /**
      * Reads a file and returns its lines as an array of strings.
      *
@@ -9,6 +9,7 @@ function getNickS(filepath) {
      * where each element is a line from the file, or rejects with an error.  
      * Resolves with an empty array if the file is empty.
     */
+    const filepath = String.raw`C:\Users\user\OneDrive\RPG's\Chapéus De Palha _ Alex Thierry\Membros (Apenas NickS).md`
     return new Promise((resolve, reject) => {
         fs.readFile(filepath, 'utf8', (err, data) => {
             if (err) {

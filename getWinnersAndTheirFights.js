@@ -1,14 +1,14 @@
-const { readFile } = require('./fs2.js')
+const { readFile } = require('./myfs.js')
 
-async function winnersAndTheirFights() { // Make the function async
-	const winnerData = await readFile(process.env.FILEPATH_NICK_NUMBER_DATA_OF_NICK_VENCEDOR_ARENA_SC); // Use await to wait for the file
-	winnerData = JSON.parse(winnerData)
+async function winnersAndTheirFights(winners) { // Make the function async
+	// let data = await readFile(process.env.WINNERS_ARENA_SC); // Use await to wait for the file
+	// let winnerJson = JSON.parse(data)
 	// ... rest of the code
 	const winnerCounts = {};
 
-	fileContent.forEach(winnerData => {
-		const vencedor = winnerData.vencedor;
-		winnerCounts[vencedor] = (winnerCounts[vencedor] || 0) + 1;
+	winners.forEach(winnerJson => {
+		const winner = winnerJson.winner;
+		winnerCounts[winner] = (winnerCounts[winner] || 0) + 1;
 	});
 
 	return winnerCounts;
