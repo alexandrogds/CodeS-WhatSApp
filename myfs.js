@@ -14,7 +14,7 @@ async function appendFile(path, data) {  // Make the function async
 
 async function readFile(path) {
 	try {
-		console.log('iniciando leitura de um arquivo')
+		console.log(`iniciando leitura do arquivo ${path}`)
 		const content = await fs.readFile(path, 'utf-8');
 		console.log('arquivo lido, retornando content')
 		return content;

@@ -57,16 +57,6 @@ client.on('qr', (qr) => {
     qrcode.generate(qr, {small: true});
 });
 
-async function readDragonMembers() {
-    try {
-        const content = await readFile(`C:/Users/user/OneDrive/RPG's/Zarcovi/membros dragon gakure.md`, 'utf-8');
-        return content;
-    } catch (error) {
-        console.error('Error reading Dragon Gakure members file:', error);
-        return null;
-    }
-}
-
 async function menuCLI() {
     let a = readline.createInterface({
         input: process.stdin,
@@ -77,6 +67,16 @@ async function menuCLI() {
         console.log(`You entered: ${input}`);
         a.close();
     });
+}
+
+function removeFirst9After55(str) {
+  if (str.startsWith("55") && str.length === 13) {
+    const index = str.indexOf("9", 3); // Start searching from the third character (index 2)
+    if (index !== -1) {
+      return str.substring(0, index) + str.substring(index + 1);
+    }
+  }
+  return str;
 }
 
 // Function to initialize data (nicks, telefones, etc.)
@@ -99,6 +99,7 @@ async function Comandos(message) {
         qwe = 'ARENASC'
     }
     if (message.from === group && message.body != '.tag') {
+        // ARENA SC CONTAGEM DE LUTAS EM TEMPO REAL
         console.log(qwe)
         console.log(group)
         console.log(`message.body:`, message.body)
@@ -287,6 +288,7 @@ async function Comandos(message) {
         await client.sendMessage(group, table)
         console.log('Mensagem enviada.')
     } else if (message.author == '559581042843@c.us' && message.body.toLowerCase() === process.env.PREFIX + 'tag'.toLowerCase()) {
+        // to tag _ marcar todos do grupo.
         const chat = await message.getChat();
         let mentions = [];
         let pessoas = ''
@@ -308,33 +310,12 @@ async function Comandos(message) {
 
         await client.sendMessage(message.from, msg);
     } else if (message.body.toLowerCase() === process.env.PREFIX + 'Dg'.toLowerCase()) {
-        if (message.author) {
+        if (message.author != '559581042843@c.us' || message.from != '120363369843995074@g.us') {
             return
         }
 
-        // await menuCLI()
-
-        // console.log(message);
-
-        // let admin = await message.getContact();
-        // if (lista_admins.includes(admin.id.user)) {
-        // let usuario = await message.getContact();
-        // if(message.author === usuario.id._serialized){
-
-        // let lista = bicho.map(user => `${user}@c.us`);
-        // let pessoas = `@${bicho.join(', @')}`;
-        // await client.sendMessage(message.from, pessoas, {mentions: lista});
-
         // const media = MessageMedia.fromFilePath(`./pictures/bloisinhos/blois${random_blois}.png`);
         // await client.sendMessage(message.from, media, { sendMediaAsSticker: true });
-
-        let membros_msg = await readDragonMembers();
-        let numberPattern = /\d{8,}/g;  // matches 8 or more consecutive digits
-        let numbers = membros_msg.match(numberPattern) || [];
-        let mentions = [];
-        for (let number of numbers) {
-            mentions.push(`${number}@c.us`);
-        }
 
         // const chat = await message.getChat();
         // let mentions = [];
@@ -346,20 +327,28 @@ async function Comandos(message) {
         //     break
         // }
         // await chat.sendMessage(pessoas, {mentions});
+        async function send_file_content_to_group_mentioning_numbers_of_content(file_path, group_id){
+            let membros_msg = await readFile(file_path, 'utf-8');
+            let numberPattern = /\d{8,}/g;  // matches 8 or more consecutive digits
+            let numbers = membros_msg.match(numberPattern) || [];
+            console.log(numbers)
+            let mentions = [];
+            for (let number of numbers) {
+                mentions.push(`${removeFirst9After55(number)}@c.us`);
+            }
+            console.log(mentions)
+            await client.sendMessage(group_id, membros_msg, { mentions: mentions });
+        }
 
-        // await client.sendMessage(message.to, membros_msg, { mentions: mentions });
+        let file_path; let group_id
 
-        // let msg = '@5595981042843';
-        // let mentions = ['5595981042843@c.us'];
-        // await client.sendMessage(message.to, msg, { mentions: mentions });
+        file_path = process.env.DRAGON_MEMBERS_IN_SHEET_CLOUD_FILE
+        group_id = process.env.GROUP_TO_SEND_CONTACTS_TO_RECRUIT_TO_THATY
+        await send_file_content_to_group_mentioning_numbers_of_content(file_path, group_id)
 
-        await client.sendMessage(group_dragon, membros_msg, { mentions: mentions });
-        // await client.sendMessage(group_swap, membros_msg, { mentions: mentions });
-        // if (message.fromMe) {
-        //     await client.sendMessage(message.to, membros_msg, { mentions: mentions });
-        // } else {
-        //     await client.sendMessage(message.from, membros_msg, { mentions: mentions });
-        // }
+        file_path = process.env.DRAGON_MEMBERS_TO_PUT_IN_SHEET_CLOUD_FILE
+        group_id = process.env.GROUP_TO_SEND_CONTACTS_TO_RECRUIT_TO_THATY
+        await send_file_content_to_group_mentioning_numbers_of_content(file_path, group_id)
     }
 }
 
@@ -372,10 +361,10 @@ let flag_spam = 0;
 // Bot, em loop, lendo as mensagens
 client.on('message_create', async message => {
 
-    if ( message.from === process.env.TEST_GROUP) {
+    if ( message.from === process.env.TEST_GROUP || process.env.DEBUG) {
         console.log('TEST_GROUP')
         console.log(process.env.TEST_GROUP)
-        console.log(`message.body:`, message.body)
+        console.log(`message.body:`, message.body.substring(0, 50))
         console.log(`message.from:`, message.from)
         console.log(`message.to:`, message.to)
         console.log(`message.fromMe:`, message.fromMe)

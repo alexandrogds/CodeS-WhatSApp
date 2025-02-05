@@ -1,7 +1,10 @@
 const fs = require('fs')
+const dotenv = require('dotenv')
+
+dotenv.config({ path: './.env' });
 
 async function getTelefoneS() {
-    filePath = String.raw`C:\Users\user\OneDrive\RPG's\Chapéus De Palha _ Alex Thierry\nicks e telefones.md`
+    filePath = process.env.FILE_WITH_NICKS_AND_TELEFONES_DA_ARENA_SC
     try {
         let fileContent = await fs.readFileSync(filePath, 'utf-8');
         let lines = fileContent.split(/\r?\n/).filter(line => line.trim() !== "");
@@ -13,7 +16,7 @@ async function getTelefoneS() {
             let telefone = firstSpaceIndex === -1 ? '' : line.slice(firstSpaceIndex)
             telefone = telefone.replace(/\D/g, "") || ''
             if (telefone == '') {
-                console.error(`No phone number found for nick: ${nick}`); // Or other error handling
+                //console.error(`No phone number found for nick: ${nick}`); // Or other error handling
                 continue
             }
             nicksETelefones[nick.toLowerCase()] = telefone; // Return empty string if no numbers are found
@@ -29,9 +32,8 @@ async function getTelefoneS() {
 
 // Example usage:
 async function example() {
-    const filePath = String.raw`C:/Users/user/OneDrive/RPG's/Chapéus De Palha _ Alex Thierry/nicks e telefones.md`
     const phones = await getTelefoneS();
-    console.log(phones);
+    //console.log(phones);
 
     // You can now use nicksAndPhones in your bot.  Example:
 
