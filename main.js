@@ -89,19 +89,18 @@ initializeData()
 // Função principal que rege todos os comandos
 async function Comandos(message) {
     /*--- Comandos Ajuda ---*/
-    let group
-    let qwe
+    let group_arena_sc; let qwe
     if (process.env.DEBUG) {
-        group = process.env.TEST_GROUP
+        group_arena_sc = process.env.TEST_GROUP
         qwe = 'TEST_GROUP'
     } else if (!process.env.DEBUG) {
-        group = process.env.ARENASC
+        group_arena_sc = process.env.ARENASC
         qwe = 'ARENASC'
     }
-    if (message.from === group && message.body != '.tag') {
+    if (message.from === group_arena_sc && message.body != '.tag') {
         // ARENA SC CONTAGEM DE LUTAS EM TEMPO REAL
         console.log(qwe)
-        console.log(group)
+        console.log(group_arena_sc)
         console.log(`message.body:`, message.body)
         console.log(`message.from:`, message.from)
         console.log(`message.to:`, message.to)
@@ -287,7 +286,7 @@ async function Comandos(message) {
         console.log(typeof table)
         await client.sendMessage(group, table)
         console.log('Mensagem enviada.')
-    } else if (message.author == '559581042843@c.us' && message.body.toLowerCase() === process.env.PREFIX + 'tag'.toLowerCase()) {
+    } else if (message.author == process.env.OWNER_NUMBER && message.body.toLowerCase() === process.env.PREFIX + 'tag'.toLowerCase()) {
         // to tag _ marcar todos do grupo.
         const chat = await message.getChat();
         let mentions = [];
@@ -301,7 +300,8 @@ async function Comandos(message) {
         // await chat.sendMessage(pessoas, {mentions});
         await chat.sendMessage('Leiam a mensagem acima.', {mentions});
     } else if (message.body.toLowerCase() === process.env.PREFIX + 'Menu'.toLowerCase()) {
-        if (!message.author) {
+        // menu no pv do bot
+        if (message.to != '559591637189@c.us' || message.from != '559581042843@c.us') {
             return
         }
 
@@ -310,6 +310,7 @@ async function Comandos(message) {
 
         await client.sendMessage(message.from, msg);
     } else if (message.body.toLowerCase() === process.env.PREFIX + 'Dg'.toLowerCase()) {
+        // enviar lista de membros do dragon no grupo que passo os contatos para thaty
         if (message.author != '559581042843@c.us' || message.from != '120363369843995074@g.us') {
             return
         }
@@ -349,6 +350,15 @@ async function Comandos(message) {
         file_path = process.env.DRAGON_MEMBERS_TO_PUT_IN_SHEET_CLOUD_FILE
         group_id = process.env.GROUP_TO_SEND_CONTACTS_TO_RECRUIT_TO_THATY
         await send_file_content_to_group_mentioning_numbers_of_content(file_path, group_id)
+    } else {
+        // eventos zarcovi
+        if (message.author != process.env.BOT_NUMBER || message.to != process.env.DRAGON) {
+            return
+        }
+        // 📝 Evento: História Contínua 📝
+        // prompts openai
+        // me de uma frase que inicia uma historia. somente retorne a frase que inicia a historia
+        // a frase "oi, tudo bem" continua o início de história "Em uma cidade cercada por mistérios e segredos, onde o brilho do luar revelava mais do que apenas sombras, um jovem destemido decidiu embarcar em uma jornada que mudaria sua vida para sempre."? Responda com apenas "Sim" ou "Não".
     }
 }
 
