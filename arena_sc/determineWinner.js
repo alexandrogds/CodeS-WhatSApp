@@ -1,5 +1,3 @@
-const { registrar_pontos } = require('./registrarPontos'); // Use promises for easier async handling
-
 function determineWinnerOneFlag(flagPart, resultados) {
 	const playerIndex = parseInt(flagPart[0], 10);
 	const stat = flagPart.slice(4); // Extract "mana" or "vida"

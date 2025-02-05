@@ -1,4 +1,3 @@
-const { readFile } = require('./myfs.js')
 
 async function winnersAndTheirFights(winners) { // Make the function async
 	// let data = await readFile(process.env.WINNERS_ARENA_SC); // Use await to wait for the file

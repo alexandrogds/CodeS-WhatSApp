@@ -1,5 +1,5 @@
 const { readFile } = require('./myfs.js')
-const getMapNickSUnicode = require('./getMapNickSUnicode.js')
+const getMapNickSUnicode = require('./arena_sc/getMapNickSUnicode.js')
 
 async function generateTable(winnerS) { // Make the function async
 	let reply = ''

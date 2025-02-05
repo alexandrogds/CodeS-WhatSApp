@@ -1,5 +1,5 @@
-const getNickSUniCode = require('./getNickSUniCode.js')
-const getNickS = require('./getNickS.js')
+const getNickSUniCode = require('./arena_sc/getNickSUniCode.js')
+const getNickS = require('./arena_sc/getNickS.js')
 
 async function mapearNickSUnicode() {
     let nickSUniCode = await getNickSUniCode();

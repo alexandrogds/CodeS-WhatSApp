@@ -1,4 +1,4 @@
-const { registrarPontos } = require('./registrarPontos')
+const { registrarPontos } = require('./arena_sc/registrarPontos')
 
 // Helper function to avoid redundant code for registrar_pontos calls
 function registrarPontosHelper(vencedor) {
