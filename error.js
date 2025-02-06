@@ -1,12 +1,18 @@
-const myfs = require('./myfs')
+const dotenv = require('dotenv')
+const { appendFile } = require('./myfs')
+
+dotenv.config({ path: './.env' });
 
 // error.js
 function error(message, code, info) {
-	const timestamp = new Date().toLocaleTimeString()
+	const time = new Date().toLocaleTimeString()
 	const data = new Date().toLocaleDateString()
-	const dt = data + ' ' + timestamp
-	let out = dt + '_' + message.replace('/\n/g', '/n') + 'code=' + code + 'info=' + info
-	myfs.appendFile(String.raw`C:\Users\user\OneDrive\RPG's\Chapéus De Palha _ Alex Thierry\bot.log`, out)
+	const dt = data + ' ' + time
+	
+	let out = dt + '; ' + message.split(/\r\n|\n|\r/).join("/n"); + '; code=' + code + '; info=' + info
+	console.error(out)
+	let file_path = process.env.FILE_WITH_LOGS_DA_ARENA_SC
+	appendFile(file_path, out)
 }
 
-module.exports = error;
+module.exports = error

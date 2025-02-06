@@ -1,3 +1,5 @@
+
+
 function registrar_pontos(telefones, juizes_e_os_players_da_luta, quem_enviou_a_mensagem_anterior__juiz, nicks_e_seus_telefones, data_hora_da_ultima_tabela, dia, mes, ano, nicks, data_hora_objeto, dia_semana_numero, aux_dia_semana_numero, nicks_e_suas_quantidade_de_vitorias, datas_nicks_e_suas_quantidade_de_vitorias, meses_e_nicks_com_suas_quantidade_de_vitorias, periodo_mensal, periodo_semanal, _nicks, vencedor) {
     if (!telefones.includes(quem_enviou_a_mensagem_anterior__juiz)) {
         if (!(periodo_semanal in juizes_e_os_players_da_luta)) {

@@ -1,3 +1,5 @@
+
+
 const fs = require('fs')
 
 function getNickS() {
@@ -9,7 +11,7 @@ function getNickS() {
      * where each element is a line from the file, or rejects with an error.  
      * Resolves with an empty array if the file is empty.
     */
-    const filepath = String.raw`C:\Users\user\OneDrive\RPG's\Chapéus De Palha _ Alex Thierry\Membros (Apenas NickS).md`
+    const filepath = process.env.FILE_WITH_NICKS_DA_ARENA_SC
     return new Promise((resolve, reject) => {
         fs.readFile(filepath, 'utf8', (err, data) => {
             if (err) {
@@ -29,34 +31,4 @@ function getNickS() {
     });
 }
 
-
-// Example usage (async/await):
-//async function main() {
-//    try {
-//        const filepath = 'my_file.txt'; // Replace with your file path
-//        const lines = await getNickS(filepath);
-//        if (lines) {
-//            console.log(lines);
-//        }
-//    } catch (error) {
-//        console.error("An error occurred:", error);
-//    }
-//}
-
-
-//main();
-
-
-// Example usage (Promises with then/catch)
-// const filepath = 'my_file.txt';
-// getLinesAsArray(filepath)
-//   .then(lines => {
-//        if(lines){
-//           console.log(lines); //output array of lines
-//         }
-//   })
-//   .catch(error => {
-//     console.error("An error occurred:", error); //handle errors
-//   });
-
-module.exports = getNickS
+module.exports = { getNickS }

@@ -1,21 +1,25 @@
-const { readFile } = require('./myfs.js')
-const getMapNickSUnicode = require('./arena_sc/getMapNickSUnicode.js')
+
+
+const dotenv = require('dotenv')
+const { readFile } = require('../myfs.js')
+const { getMapNickSUnicode } = require('./getMapNickSUnicode.js')
+
+dotenv.config({ path: '../.env' });
 
 async function generateTable(winnerS) { // Make the function async
 	let reply = ''
-	console.log('init =', typeof reply)
 	
-    const pathTitle = String.raw`C:\Users\user\OneDrive\RPG's\Chapéus De Palha _ Alex Thierry\molde de contagem de lutas na arena sc - title.md`
+    const pathTitle = process.env.FILE_WITH_TITLE_MOLDE_DA_CONTAGEM_PARCIAL_DE_LUTAS_DA_ARENA_SC
     let title = await readFile(pathTitle); // Use await since readFile is async
-    console.log('title\n', title)
+    // console.log('title\n', title)
 
-    const pathDivisor = String.raw`C:\Users\user\OneDrive\RPG's\Chapéus De Palha _ Alex Thierry\molde de contagem de lutas na arena sc - divisor.md`
+    const pathDivisor = process.env.FILE_WITH_DIVIDER_DO_MOLDE_DA_CONTAGEM_PARCIAL_DE_LUTAS_DA_ARENA_SC
     let divider = await readFile(pathDivisor); // Use await since readFile is async
-    console.log('divider\n', divider)
+    // console.log('divider\n', divider)
 
-	const pathContent = String.raw`C:\Users\user\OneDrive\RPG's\Chapéus De Palha _ Alex Thierry\molde de contagem de lutas na arena sc - content.md`
+	const pathContent = process.env.FILE_WITH_CONTENT_DO_MOLDE_DA_CONTAGEM_PARCIAL_DE_LUTAS_DA_ARENA_SC
     let content = await readFile(pathContent); // Use await since readFile is async
-	console.log('content\n', content)
+	// console.log('content\n', content)
 
 	let nickSUniCode = await getMapNickSUnicode()
 
@@ -31,7 +35,6 @@ async function generateTable(winnerS) { // Make the function async
 	}
 
 	reply += title + '\n' + divider
-	console.log('head =', typeof reply)
 
 	//Map winnerS to an object with { nick: winners }
 	const mappedWinners = {};
@@ -46,24 +49,9 @@ async function generateTable(winnerS) { // Make the function async
 		aux2 = aux.replace('Nick', mappedWinners[nick]['nickUnicode']); // Use RegExp for dynamic replacement
 		aux2 = aux2.replace('00', mappedWinners[nick]['wins']); // Use RegExp for dynamic replacement
 		reply += '\n' + aux2 + '\n' + divider
-		console.log('add winner =', typeof reply)
 	}
 
-	console.log('end =', typeof reply)
 	return reply;
 }
 
-// Example usage:
-// async function main(){
-
-//     const finalContent = await generateTable();
-
-//     if (finalContent){ //Check if the function returned correctly.
-//         console.log(finalContent);
-//         //Now save to file or send a message
-//     }
-// }
-
-// main()
-
-module.exports = generateTable
+module.exports = { generateTable }

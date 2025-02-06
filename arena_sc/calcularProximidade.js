@@ -1,4 +1,4 @@
-const error = require('./error')
+
 
 function calcularProximidade(message, palavras) {
 	const linhas = message.split(/\r?\n/);
@@ -42,43 +42,6 @@ function calcularProximidade(message, palavras) {
 			}
 		}
 		resultados.push([palavra, linhaNumerosProxima]);
-		continue
-		resultados[palavra] = {}
-		if (linhaNumerosProxima.length == 2) {
-			resultados[palavra]['status']['life'] = linhaNumerosProxima[0]
-			resultados[palavra]['status']['chakra'] = linhaNumerosProxima[1]
-		} else if (linhaNumerosProxima.length == 3) {
-			if (linhaNumerosProxima[0] == 0) {
-				if (linhaNumerosProxima[1] == 0) {
-					if (linhaNumerosProxima[2] == 0) {
-						error(message, '456654', 'EFEITO ZERADO ASSIM NÃO DÁ PARA IDENTIFICAR OS ATRIBUTOS CORRETAMENTE')
-						return []
-					} else {
-						resultados[palavra]['status']['life'] = linhaNumerosProxima[0]
-						resultados[palavra]['status']['chakra'] = linhaNumerosProxima[1]
-					}
-				} else if (linhaNumerosProxima[2] == 0) {
-					resultados[palavra]['status']['life'] = linhaNumerosProxima[0]
-					resultados[palavra]['status']['chakra'] = linhaNumerosProxima[2]
-				}
-			} else if (linhaNumerosProxima[1] == 0) {
-				if (linhaNumerosProxima[2] == 0) {
-					error(message, '741741', 'VIDA NÃO ESTÁ ZERADA OU EFEITO DESLOCADO ENQUANTO O CODE APENAS SUPORTA EFEITO APÓS O ATRIBUTO AO QUAL O EFEITO É APLICADO')
-					return []
-				} else {
-					error(message, '3214569', 'SÓ HÁ UM ATRIBUTO ZERADO DESSA FORMA O CODE NÃO CONSEGUE DECIDIR QUAL ATRIBUTO É A VIDA E QUAL É O CHAKRA')
-					return []
-				}
-			} else {
-				error(message, '741789', 'DOIS STATUS NÃO ZERADOS E UM ZERADO ASSIM NÃO DÁ PARA IDENTIFICAR CORRETAMENTE QUAL É A VIDA E QUAL É O CHAKRA.')
-				return []
-			}
-		} else if (linhaNumerosProxima.length == 4) {
-			if (linhaNumerosProxima[0] == 0) {
-			}
-		} else {
-			error(message, '987789', 'IDENTIFICADO MAIS DE QUATRO ATRIBUTOS POR LINHA DE STATUS E O CODE AINDA NAO OFERECE SUPORTE PARA ISSO')
-		}
 	}
 
 	return resultados;
@@ -90,7 +53,6 @@ function temZerosConsecutivos(linha) {
 	// The Python code example didn't include this function's implementation.
 	// Example (adjust as needed):
 	return linha.includes("00"); // Or a more robust check for consecutive zeros.
-
 }
 
 // Example usage:
@@ -106,4 +68,4 @@ function temZerosConsecutivos(linha) {
 // const resultados = calcularProximidade(linhas, palavras);
 // console.log(resultados);
 
-module.exports = calcularProximidade;
+module.exports = { calcularProximidade }

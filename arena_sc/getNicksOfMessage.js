@@ -1,4 +1,9 @@
-const { readFile } = require('./myfs')  // Use promises for easier async handling
+
+
+const dotenv = require('dotenv')
+const { readFile } = require('../myfs')  // Use promises for easier async handling
+
+dotenv.config({ path: '../.env' });
 
 async function getNicksFromFile(filePath) {
 	try {
@@ -13,7 +18,7 @@ async function getNicksFromFile(filePath) {
 
 // Example usage:
 async function getNicks() {
-	const filePath = String.raw`C:/Users/user/OneDrive/RPG's/Chapéus De Palha _ Alex Thierry/nicks.md`
+	const filePath = process.env.FILE_WITH_NICKS_DA_ARENA_SC
 	const nicks = await getNicksFromFile(filePath);
 	// if (nicks.length === 0){
 	//     console.log(`Empty Nick List`)
@@ -21,12 +26,11 @@ async function getNicks() {
 	return nicks
 }
 
-async function getNicksOfMessage(message) {
+async function getNickSOfMessage(message) {
 
 	// ... other code ...
 	const nicks = await getNicks(); // Call the async function to get the nicks
 
-	let nick_count = 0;
 	const _nicks = [];
 
 	for (const nick of nicks) {
@@ -35,11 +39,10 @@ async function getNicksOfMessage(message) {
 		const resultados = message.body.toLowerCase().match(regex) || [];
 
 		if (resultados.length > 0) {
-			nick_count++;
 			_nicks.push(nick.toLowerCase());
 		}
 	}
 	return _nicks;
 }
 
-module.exports = getNicksOfMessage; 
+module.exports = { getNickSOfMessage }

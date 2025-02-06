@@ -1,5 +1,5 @@
 
-async function winnersAndTheirFights(winners) { // Make the function async
+async function getWinnersAndTheirFights(winners) { // Make the function async
 	// let data = await readFile(process.env.WINNERS_ARENA_SC); // Use await to wait for the file
 	// let winnerJson = JSON.parse(data)
 	// ... rest of the code
@@ -13,4 +13,4 @@ async function winnersAndTheirFights(winners) { // Make the function async
 	return winnerCounts;
 }
 
-module.exports = winnersAndTheirFights
+module.exports = { getWinnersAndTheirFights }

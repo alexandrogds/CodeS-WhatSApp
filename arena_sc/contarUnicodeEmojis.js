@@ -1,3 +1,5 @@
+
+
 function contarUnicodeEmojis(str) {
 	if (!str) {
 		return 0; // Handle null or undefined input
@@ -7,4 +9,4 @@ function contarUnicodeEmojis(str) {
 	return matches.length;
 }
 
-module.exports = contarUnicodeEmojis;
+module.exports = { contarUnicodeEmojis }
