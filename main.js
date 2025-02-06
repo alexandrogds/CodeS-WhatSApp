@@ -8,7 +8,7 @@ const { calcularProximidade } = require('./arena_sc/calcularProximidade.js')
 const { getNickSOfMessage } = require('./arena_sc/getNickSOfMessage.js')
 const { getTelefoneS } = require('./arena_sc/getTelefoneS.js')
 const { contarUnicodeEmojis } = require('./arena_sc/contarUnicodeEmojis.js')
-const { handleOneFlag, handleTwoFlags, handle3Flags, handle4Flags } = require('./arena_sc/determineWinner.js') // const the functions
+const { resolve_flag_debuffs_e_buffs } = require('./arena_sc/resolve_flag_debuffs_e_buffs.js') // const the functions
 const { appendFile, readFile, writeFile } = require('./myfs.js') // const the functions
 const { generateTable } = require('./arena_sc/generateTable.js')
 const { getWinnersAndTheirFights } = require('./arena_sc/getWinnersAndTheirFights.js')
@@ -197,24 +197,17 @@ async function Comandos(message) {
                 if (resultados[0][1][0] === 0 && resultados[1][1][0] === 0) {
                     console.log('ENTROU<-123')
                     const a99 = flag.split(';').filter(x => x !== '');
-                    if (a99.length === 1) {
-                        console.log('ENTROU<- ONE FLAGS')
-                        winner = handleOneFlag(a99, resultados);
-                    } else if (a99.length === 2) {
-                        console.log('ENTROU<-TWO FLAGS')
-                        winner = handleTwoFlags(a99, resultados);
-                    } else if (a99.length === 3) {
-                        console.log('ENTROU<-TWO FLAGS')
-                        winner = handle3Flags(a99, resultados);
-                    } else if (a99.length === 4) {
-                        console.log('ENTROU<-TWO FLAGS')
-                        winner = handle4Flags(a99, resultados);
+                    winner = resolve_flag_debuffs_e_buffs(resultados, a99)
+                    if (winner == 1) {
+                        error(message.body, 147852369512, 'VIDA E MANAS IGUAIS ASSIM PRECISA PESQUISAR NA MENSAGEM ANTERIOR QUAL O VENCEDOR')
+                        return
                     }
                 } else {
-                    determinar_vencedor_com_life_diferentes()
+                    winner = determinar_vencedor_com_life_diferentes()
                 }
             } else if (resultados[0][1] && resultados[1][1] && resultados[0][1].join("") === resultados[1][1].join("") && (resultados[0][1].includes(0) || resultados[1][1].includes(0))) {
                 error(message.body, '22', 'TRATAR PARA PEGAR A TABELA ANTERIOR PARA DECIDIR QUEM VENCE.\nRESULTADOS = ' + JSON.stringify(resultados));
+                return
             } else if (resultados[0][1] && resultados[1][1]) {
                 if (resultados[0][1][0] === 0 && resultados[1][1][0] === 0) {  // Both vida are 0
                     if (resultados[0][1][1] < resultados[1][1][1]) {
@@ -235,7 +228,7 @@ async function Comandos(message) {
                             return resultados[0][0]
                         }
                     }
-                    determinar_vencedor_com_life_diferentes()
+                    winner = determinar_vencedor_com_life_diferentes()
                 }
             }
         } else if (nick_count === 1) {
@@ -285,8 +278,11 @@ async function Comandos(message) {
         console.log('Enviando mensagem.')
         await client.sendMessage(group_arena_sc, table)
         console.log('Mensagem enviada.')
-    } else if (message.author == process.env.OWNER_NUMBER && message.body.toLowerCase() === process.env.PREFIX + 'tag'.toLowerCase()) {
+    } else if (message.body.toLowerCase() === process.env.PREFIX + 'tag'.toLowerCase()) {
         // to tag _ marcar todos do grupo.
+        if (message.author != process.env.OWNER_NUMBER) {
+            return
+        }
         const chat = await message.getChat();
         let mentions = [];
         let pessoas = ''
@@ -298,16 +294,6 @@ async function Comandos(message) {
         }
         // await chat.sendMessage(pessoas, {mentions});
         await chat.sendMessage('Leiam a mensagem acima.', {mentions});
-    } else if (message.body.toLowerCase() === process.env.PREFIX + 'Menu'.toLowerCase()) {
-        // menu no pv do bot
-        if (message.to != '559591637189@c.us' || message.from != '559581042843@c.us') {
-            return
-        }
-
-        let msg = `Comandos disponíveis:\n\n`;
-        msg += `Dg = Enviar lista de membros do Dragon Gakure\n`;
-
-        await client.sendMessage(message.from, msg);
     } else if (message.body.toLowerCase() === process.env.PREFIX + 'Dg'.toLowerCase()) {
         // enviar lista de membros do dragon no grupo que passo os contatos para thaty
         if (message.author != '559581042843@c.us' || message.from != '120363369843995074@g.us') {
@@ -350,13 +336,14 @@ async function Comandos(message) {
         group_id = process.env.GROUP_TO_SEND_CONTACTS_TO_RECRUIT_TO_THATY
         await send_file_content_to_group_mentioning_numbers_of_content(file_path, group_id)
     } else {
+        // eventos zarcovi
+        // veja o README.md
         let group_dragon_gakure
         if (process.env.DEBUG) {
             group_dragon_gakure = process.env.TEST_GROUP
         } else if (!process.env.DEBUG) {
             group_dragon_gakure = process.env.DRAGON_GAKURE
         }
-        // eventos zarcovi
         if (message.author != process.env.BOT_NUMBER || message.to != group_dragon_gakure) {
             return
         }
@@ -376,7 +363,7 @@ async function Comandos(message) {
     }
 }
 
-let lista_comandos = ['Dg', 'Menu', 'tag'].map(cmd => process.env.PREFIX + cmd)
+let lista_comandos = new Set(['Dg', 'Menu', 'tag'].map(cmd => process.env.PREFIX + cmd))
 
 // Spam handling
 let lista_spam = [];
@@ -385,7 +372,7 @@ let flag_spam = 0;
 // Bot, em loop, lendo as mensagens
 client.on('message_create', async message => {
 
-    if ( message.from === process.env.TEST_GROUP || process.env.DEBUG) {
+    if (message.from === process.env.TEST_GROUP || process.env.DEBUG) {
         console.log('TEST_GROUP')
         console.log(process.env.TEST_GROUP)
         console.log(`message.body:`, message.body.substring(0, 50))
@@ -402,7 +389,7 @@ client.on('message_create', async message => {
         console.log(new Date().toLocaleTimeString());
         // process.stdout.write(' ', typeof String.raw`${message.body}`)
     }
-    
+
     process.stdout.write('.');
 
     if ([...lista_comandos].some(cmd => cmd.toLowerCase() === String.raw`${message.body}`.toLowerCase())) {
@@ -419,7 +406,9 @@ client.on('message_create', async message => {
             await Comandos(message);
         }
     } else if ( message.from === process.env.TEST_GROUP || message.from === process.env.ARENASC) {
-        await Comandos(message);
+        if (message.body.length > 16) {
+            await Comandos(message);
+        }
     }
 });
 
