@@ -29,6 +29,9 @@ global.client = new Client({ authStrategy: new LocalAuth() });
 global.client.once('ready', () => {
     console.log('Client is ready!');
     console.log(new Date().toLocaleTimeString());
+    if(process.env.DEBUG) {
+        console.warn('DEBUG On. É isso mesmo?')
+    }
 });
 
 // When the client received QR-Code
@@ -242,8 +245,7 @@ global.client.on('message_create', async message => {
         console.log(new Date().toLocaleTimeString(), '\n');
         // process.stdout.write(' ', typeof String.raw`${message.body}`)
     }
-
-    process.stdout.write('.');
+    process.stdout.write(new Date().toLocaleTimeString() + '; ');
 
     if ([...lista_comandos].some(cmd => cmd.toLowerCase() === String.raw`${message.body}`.toLowerCase())) {
         setTimeout(() => {}, 4000)
