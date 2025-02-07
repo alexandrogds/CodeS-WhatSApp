@@ -1,4 +1,7 @@
+
+
 const fs = require('fs/promises'); 
+const path = require('path');
 
 async function appendFile(path, data) {  // Make the function async
 	try {
@@ -24,9 +27,10 @@ async function readFile(path) {
 	}
 }
 
-async function writeFile(path, data) {
+async function writeFile(file_path, data) {
 	try {
-		await fs.writeFile(path, data, 'utf-8');
+		await fs.mkdir(path.dirname(file_path), { recursive: true });
+		await fs.writeFile(file_path, data, 'utf-8');
 		return true;
 	} catch (error) {
 		console.error('Error write file:', error);

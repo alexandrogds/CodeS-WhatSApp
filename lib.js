@@ -11,4 +11,20 @@ function zip(arr1, arr2) {
     return result;
 }
 
-module.exports = { zip }
+function removeFirst9After55(str) {
+  // transformar os números para terem 8 digitos (BR) retirando o nono digio
+  // para que a menção funcione
+  if (str.startsWith("55") && str.length === 13) {
+    const index = str.indexOf("9", 3); // Start searching from the third character (index 2)
+    if (index !== -1) {
+      return str.substring(0, index) + str.substring(index + 1);
+    }
+  }
+  return str;
+}
+
+function strip(str) {
+  return str.replace(/^[\s\uFEFF\xA0]+|[\s\uFEFF\xA0]+$/g, '');
+}
+
+module.exports = { zip, removeFirst9After55, strip }

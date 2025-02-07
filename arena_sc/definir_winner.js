@@ -1,6 +1,5 @@
 
 
-const error = require('../error')
 const { comparar_mana_da_penultima_placa_parcial_de_luta } = require('./comparar_mana_da_penultima_placa_parcial_de_luta')
 const { definir_vencedor_tendo_buffs_debuffs_na_linha_de_atributos_principais } = require('./definir_vencedor_tendo_buffs_debuffs_na_linha_de_atributos_principais')
 const { determinar_vencedor_com_life_diferentes } = require('./determinar_vencedor_com_life_diferentes')

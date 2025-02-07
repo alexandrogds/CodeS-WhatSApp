@@ -68,6 +68,8 @@ const createMockMessage = (body, from, author) => ({
     sendMessage: jest.fn(), // Mock sendMessage
 });
 
+client.initialize();
+
 describe('Message Handling', () => {
     beforeEach(() => {
     });
@@ -116,7 +118,7 @@ describe('Message Handling', () => {
 
 
 // Initialize client *after* tests are defined (important!)
-client.initialize();
+// client.initialize();
 
 // Mock console.error for error handling tests
 console.error = jest.fn();
