@@ -82,34 +82,12 @@ function menuCLI() {
 // Função principal que rege todos os comandos
 async function Comandos(message) {
     /*--- Comandos Ajuda ---*/
-    let group_id_ifs_arena_sc_comandos; let group_if_arena_sc_comandos
-    let group_id_dragon_gakure
+    let group_id_ifs_arena_sc_comandos; let group_id_dragon_gakure
     if (process.env.DEBUG == 'true') {
         group_id_ifs_arena_sc_comandos = process.env.TEST_GROUP
-        group_if_arena_sc_comandos = 'TEST_GROUP'
         group_id_dragon_gakure = process.env.TEST_GROUP
-
-        console.log(`\nbool message.from == process.env.TEST_GROUP: ${message.from == process.env.TEST_GROUP}`);
-        console.log(`bool message.from == group_id_ifs_arena_sc_comandos: ${message.from == group_id_ifs_arena_sc_comandos}`);
-        console.log(`boll message.body != '.tag': ${message.body != '.tag'}`)
-
-        console.log('group onde will send =', group_if_arena_sc_comandos)
-        console.log('group id =', group_id_ifs_arena_sc_comandos)
-        console.log(`message.body:`, message.body)
-        console.log(`message.from:`, message.from)
-        console.log(`message.to:`, message.to)
-        console.log(`message.fromMe:`, message.fromMe)
-        console.log(`message.author:`, message.author)
-        console.log(`message.timestamp:`, message.timestamp)
-        console.log(`message.isGif:`, message.isGif)
-        // console.log(`message.isGroupMsg:`, message.isGroupMsg)
-        // console.log(`message.isMedia:`, message.isMedia)
-        // console.log(`message.isNotification:`, message.isNotification)
-        console.log(new Date().toLocaleTimeString());
-        // process.stdout.write(' ', typeof String.raw`${message.body}`)
     } else {
         group_id_ifs_arena_sc_comandos = process.env.ARENASC
-        group_if_arena_sc_comandos = 'ARENASC'
         group_id_dragon_gakure = process.env.DRAGON_GAKURE
     }
 
@@ -121,9 +99,6 @@ async function Comandos(message) {
         // enviar lista de membros do dragon no grupo que passo os contatos para thaty
         // entra aqui no debug e não no primeiro if pois a mensagem é enviada no grupo com thaty
         await send_file_membros_com_menções(message)
-    } else if (message.body.toLowerCase() === process.env.PREFIX + 'save'.toLowerCase()) {
-        //enviar com o numero do dono no pv do bot
-        save_chats(message)
     }
 
     // salvar o inicio de historia gerado com a openai em uma variavel global
@@ -140,7 +115,7 @@ async function Comandos(message) {
         // veja o README.md
         console.log('entrou into msg Evento')
 
-        if (message.from != process.env.BOT_NUMBER || message.to != group_id_dragon_gakure) {
+        if (!message.fromMe || message.to != group_id_dragon_gakure) {
             console.log('entrou no return')
             return
         }
@@ -225,7 +200,7 @@ async function Comandos(message) {
 
 let lista_comandos = new Set(['Dg', 'Eventos', 'tag'].map(cmd => process.env.PREFIX + cmd))
 let messagem_from_list = new Set([process.env.TEST_GROUP, process.env.ARENASC, 
-    process.env.BOT_NUMBER, process.env.DRAGON_GAKURE, process.env.OWNER_NUMBER])
+    process.env.DRAGON_GAKURE, process.env.OWNER_NUMBER])
 
 // Bot, em loop, lendo as mensagens
 global.client.on('message_create', async message => {
@@ -247,7 +222,7 @@ global.client.on('message_create', async message => {
         console.log(new Date().toLocaleTimeString(), '\n');
         // process.stdout.write(' ', typeof String.raw`${message.body}`)
     }
-    process.stdout.write(new Date().toLocaleTimeString() + '; ');
+    process.stdout.write('now: ' + new Date().toLocaleTimeString() + '; msg_time: ' + new Date(message.timestamp).toLocaleTimeString());
 
     if ([...lista_comandos].some(cmd => cmd.toLowerCase() === String.raw`${message.body}`.toLowerCase())) {
         setTimeout(() => {}, 4000)
@@ -257,6 +232,8 @@ global.client.on('message_create', async message => {
             // setTimeout(() => {}, 4000)
             await Comandos(message);
         // }
+    } else if (message.fromMe) {
+        await Comandos(message);
     }
 });
 
