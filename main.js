@@ -140,7 +140,7 @@ async function Comandos(message) {
         console.log('1236544152')
         async function send_inicio_de_historia() {
             let inicio_de_historia
-            if (process.env.DEBUG) {
+            if (process.env.DEBUG == 'true') {
                 inicio_de_historia = 'A tempestade chegou sem aviso, trazendo consigo segredos há muito enterrados.'
             } else {
                 inicio_de_historia = await get_of_open_ai('me de uma frase que inicia uma historia. somente retorne a frase que inicia a historia')
