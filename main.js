@@ -29,7 +29,7 @@ global.client = new Client({ authStrategy: new LocalAuth() });
 global.client.once('ready', () => {
     console.log('Client is ready!');
     console.log(new Date().toLocaleTimeString());
-    if(process.env.DEBUG) {
+    if(process.env.DEBUG == 'true') {
         console.warn('DEBUG On. É isso mesmo?')
     }
 });
@@ -84,7 +84,7 @@ async function Comandos(message) {
     /*--- Comandos Ajuda ---*/
     let group_id_ifs_arena_sc_comandos; let group_if_arena_sc_comandos
     let group_id_dragon_gakure
-    if (process.env.DEBUG) {
+    if (process.env.DEBUG == 'true') {
         group_id_ifs_arena_sc_comandos = process.env.TEST_GROUP
         group_if_arena_sc_comandos = 'TEST_GROUP'
         group_id_dragon_gakure = process.env.TEST_GROUP
@@ -122,6 +122,7 @@ async function Comandos(message) {
         // entra aqui no debug e não no primeiro if pois a mensagem é enviada no grupo com thaty
         await send_file_membros_com_menções(message)
     } else if (message.body.toLowerCase() === process.env.PREFIX + 'save'.toLowerCase()) {
+        //enviar com o numero do dono no pv do bot
         save_chats(message)
     }
 
@@ -223,12 +224,13 @@ async function Comandos(message) {
 }
 
 let lista_comandos = new Set(['Dg', 'Eventos', 'tag'].map(cmd => process.env.PREFIX + cmd))
-let messagem_from_list = new Set([process.env.TEST_GROUP, process.env.ARENASC, process.env.BOT_NUMBER, process.env.DRAGON_GAKURE])
+let messagem_from_list = new Set([process.env.TEST_GROUP, process.env.ARENASC, 
+    process.env.BOT_NUMBER, process.env.DRAGON_GAKURE, process.env.OWNER_NUMBER])
 
 // Bot, em loop, lendo as mensagens
 global.client.on('message_create', async message => {
 
-    if (message.from == process.env.TEST_GROUP && process.env.DEBUG) {
+    if (message.from == process.env.TEST_GROUP && process.env.DEBUG == 'true') {
         console.log('\nTEST_GROUP')
         console.log(process.env.TEST_GROUP)
         console.log(`message.body:`, message.body.substring(0, 50))
