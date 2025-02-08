@@ -40,12 +40,12 @@ async function tratar_messages_da_arena_sc(message, group_id_if_arena_sc_comando
         }
         winner = definir_winner(message, nickSOfMessage, numbers, dataHoraUser, global.mensagem_anterior, resultados)
     } else if (nick_count === 1) {
-        error(message.body, '0', `Pegar o nick da placa abaixo diferente do nick: ${nickSOfMessage[0]}`)
+        error(message.body, '0', `Pegar o nick da placa diferente do nick: ${nickSOfMessage[0]}`)
         return;
     
     } else if (nick_count === 0 && message.body && contarUnicodeEmojis(message.body) < 50) {
         // Handle the error (e.g., send a message, return) – don't just exit()
-        error(message.body, 123658, `´${numbers}; ${dataHoraUser}`)
+        error(message.body, 123658, `´${numbers}; ${dataHoraUser}; 0 nicks`)
         return
     } else if (nick_count === 3 && nickSOfMessage.some(nick => nickSOfMessage.filter(n => n === nick).length > 1)) {
         error(message.body, '10', "Pode haver duas simplificações de nicks iguais. " + "Confira o arquivo de nicks.")

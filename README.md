@@ -22,3 +22,6 @@ Para gerar um novo início de história enve `+` com o número do bot.
 npm install
 npm run start
 ```
+
+## Why Save All Chat History não deu certo
+Por que não pegava todas as mensagens em chat.fetch e chat.syncHistory() também não funcionava

@@ -11,7 +11,6 @@ const { get_of_open_ai } = require('./get_of_open_ai.js')
 const { tag_mentions } = require('./tag_mentions')
 const { strip } = require('./lib.js')
 const { send_file_membros_com_menções } = require('./zarcovi/send_file_membros_com_menções.js')
-const { save_chats } = require('./save_chats.js')
 
 require('dotenv').config({ path: './.env' });
 
@@ -100,7 +99,7 @@ async function Comandos(message) {
         // entra aqui no debug e não no primeiro if pois a mensagem é enviada no grupo com thaty
         await send_file_membros_com_menções(message)
     }
-
+    
     // salvar o inicio de historia gerado com a openai em uma variavel global
     // gerar os inicios de historia com comandos
     // lembrando que a partir da segunda geração a resposta deve apresentar a contagem de pontos.
@@ -222,7 +221,7 @@ global.client.on('message_create', async message => {
         console.log(new Date().toLocaleTimeString(), '\n');
         // process.stdout.write(' ', typeof String.raw`${message.body}`)
     }
-    process.stdout.write('now: ' + new Date().toLocaleTimeString() + '; msg_time: ' + new Date(message.timestamp).toLocaleTimeString());
+    process.stdout.write('now: ' + new Date().toLocaleTimeString() + '; msg_time: ' + new Date(message.timestamp).toLocaleTimeString() + '\n');
 
     if ([...lista_comandos].some(cmd => cmd.toLowerCase() === String.raw`${message.body}`.toLowerCase())) {
         setTimeout(() => {}, 4000)
