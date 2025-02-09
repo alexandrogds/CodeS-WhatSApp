@@ -34,13 +34,16 @@ async function getNickSOfMessage(message) {
 	const _nicks = [];
 
 	for (const nick of nicks) {
-		const pattern = nick.toLowerCase();  // Normalize to lowercase
+		const pattern = nick.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();  // Normalize to lowercase
 		const regex = new RegExp(`\\b${pattern}\\b`, 'g'); // Use word boundaries and global flag
-		const resultados = message.body.toLowerCase().match(regex) || [];
+		const resultados = message.body.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().match(regex) || [];
 
 		if (resultados.length > 0) {
 			_nicks.push(nick.toLowerCase());
 		}
+	}
+	if (process.env.DEBUG == 'true') {
+		console.log(_nicks)
 	}
 	return _nicks;
 }
