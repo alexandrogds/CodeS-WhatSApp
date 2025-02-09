@@ -198,9 +198,11 @@ async function Comandos(message) {
 }
 
 let lista_comandos = new Set(['Dg', 'Eventos', 'tag'].map(cmd => process.env.PREFIX + cmd))
+// let messagem_from_list = new Set([process.env.TEST_GROUP, process.env.ARENASC, 
+//     process.env.DRAGON_GAKURE, process.env.OWNER_NUMBER])
 let messagem_from_list = new Set([process.env.TEST_GROUP, process.env.ARENASC, 
-    process.env.DRAGON_GAKURE, process.env.OWNER_NUMBER])
-
+    process.env.OWNER_NUMBER])
+    
 // Bot, em loop, lendo as mensagens
 global.client.on('message_create', async message => {
 
@@ -232,6 +234,8 @@ global.client.on('message_create', async message => {
             await Comandos(message);
         // }
     } else if (message.fromMe) {
+        await Comandos(message);
+    } else if (global.context['is_event_running_in_dragon_gakure'] && message.from === process.env.DRAGON_GAKURE) {
         await Comandos(message);
     }
 });
