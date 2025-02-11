@@ -3,6 +3,7 @@
 /*--- Sincronização do bot com o WhatsApp ---*/
 
 const qrcode = require('qrcode-terminal')
+const readline = require('readline')
 const { Client, LocalAuth, MessageMedia } = require('whatsapp-web.js')
 const { getTelefoneS } = require('./arena_sc/getTelefoneS.js')
 const { appendFile, readFile, writeFile } = require('./myfs.js') // const the functions
@@ -81,6 +82,7 @@ function menuCLI() {
 // Função principal que rege todos os comandos
 async function Comandos(message) {
     /*--- Comandos Ajuda ---*/
+    console.log('into comandos')
     let group_id_ifs_arena_sc_comandos; let group_id_dragon_gakure
     if (process.env.DEBUG == 'true') {
         group_id_ifs_arena_sc_comandos = process.env.TEST_GROUP
@@ -99,16 +101,28 @@ async function Comandos(message) {
         // entra aqui no debug e não no primeiro if pois a mensagem é enviada no grupo com thaty
         await send_file_membros_com_menções(message)
     }
-    
+
+    console.log(1233122346)
+
     // salvar o inicio de historia gerado com a openai em uma variavel global
     // gerar os inicios de historia com comandos
     // lembrando que a partir da segunda geração a resposta deve apresentar a contagem de pontos.
-    if (message.body.toLowerCase() === process.env.PREFIX + 'tag'.toLowerCase()) {
+    if (message.body.toLowerCase().startsWith(process.env.PREFIX + 'tag'.toLowerCase()) ) {
+        // to tag _ marcar todos do grupo.
+        if (message.author != process.env.OWNER_NUMBER) {
+            return
+        }
+        let i = message.body.indexOf(" ")
+        let str = message.body.substring(i + 1)
+        await tag_mentions(false, false, str, message)
+    } else if (message.body.toLowerCase().startsWith(process.env.PREFIX + 'hide-tag'.toLowerCase()) ) {
         // to tag _ marcar todos do grupo.
         if (message.author != process.env.OWNER_NUMBER || message.from != group_id_ifs_arena_sc_comandos) {
             return
         }
-        await tag_mentions(false, true, 'Leiam a mensagem acima.', message)
+        let i = message.body.indexOf(" ")
+        let str = message.body.substring(i + 1)
+        await tag_mentions(false, true, str, message)
     } else if (message.body.toLowerCase() === 'Evento'.toLowerCase()) {
         // menu de eventos eventos zarcovi
         // veja o README.md
@@ -194,6 +208,102 @@ async function Comandos(message) {
                 await writeFile(process.env.RYOS_GANHOS + ' ' + global.context['sufixo_do_evento'].replace(/\D/g, '') + '.json', JSON.stringify(ryos, null, 2)); // Correctly call using await
             }
         }
+        if (process.env.DEBUG == 'true' ) {
+            const chats = await global.client.getChats()
+            for(let chat of chats) {
+                if (chat.isGroup == false && message.from == chat.id) {
+                    console.log('\n', message.getChat().name)
+                    console.log(message.body)
+                    let b = '\nEscreva a resposta:\n> ';
+                    console.log(b)
+                    function ddd() {
+                        return new Promise((resolve) => {
+                            let aa = readline.createInterface({
+                                input: process.stdin,
+                                output: process.stdout
+                            });
+                            aa.on('line', async (input) => {
+                                await message.reply(input)
+                                aa.close();
+                            });
+                            resolve(0)
+                        });
+                    }
+                    await ddd()
+                    break
+                }
+            }
+            if (!global.chat) {
+                let b = 'ESCOLHA UM GRUPO ABAIXO PARA LER AS MENSAGENS ATUAIS:\n> ';
+                let i = -1
+                for(let chat of chats) {
+                    i += 1
+                    if (chat.isGroup) {
+                        b += `${i} - ${chat.name}\n`
+                    } else {
+                        console.log(chat.name)
+                    }
+                }
+
+                console.log(b)
+                function bbb() {
+                    return new Promise((resolve) => {
+                        let aa = readline.createInterface({
+                            input: process.stdin,
+                            output: process.stdout
+                        });
+                        aa.on('line', async (input) => {
+                            global.chat = chats[input]
+                            aa.close();
+                        });
+                        resolve(0)
+                    });
+                }
+                await bbb()
+            } else if (global.chat.id == message.from && global.chat) {
+                for(let chat of chats) {
+                    if (chat.id == global.chat.id) {
+                        console.log('\n', message.getChat().name)
+                        console.log(message.body)
+                        let b = '\nEscreva a resposta:\n> ';
+                        console.log(b)
+                        function ccc() {
+                            return new Promise((resolve) => {
+                                let aa = readline.createInterface({
+                                    input: process.stdin,
+                                    output: process.stdout
+                                });
+                                aa.on('line', async (input) => {
+                                    await message.reply(input)
+                                    aa.close();
+                                });
+                                resolve(0)
+                            });
+                        }
+                        await ccc()
+                        break
+                    }
+                }
+            }
+            let b = 'Continuar para próxima mensagem nesse grupo? s para sim, n para escolher novo* grupo. Ignore caso tenha sido uma resposta a mensagem privada.:\n> ';
+            console.log(b)
+            function aaa() {
+                return new Promise((resolve) => {
+                    let aa = readline.createInterface({
+                        input: process.stdin,
+                        output: process.stdout
+                    });
+                    aa.on('line', async (input) => {
+                        if (input == 'n') {
+                            global.chat = null
+                        }
+                        aa.close();
+                    });
+                    resolve(0)
+                });
+            }
+            await aaa()
+        }
     }
 }
 
@@ -216,16 +326,16 @@ global.client.on('message_create', async message => {
         console.log(`message.author:`, message.author)
         console.log(`message.timestamp:`, message.timestamp)
         console.log(`message.isGif:`, message.isGif)
+        console.log(`process.env.OWNER_NUMBER`, process.env.OWNER_NUMBER)
         // console.log(`message.isGroupMsg:`, message.isGroupMsg)
         // console.log(`message.isMedia:`, message.isMedia)
         // console.log(`message.isNotification:`, message.isNotification)
-        console.log(`.bool: ${message.from === process.env.TEST_GROUP}`);
         console.log(new Date().toLocaleTimeString(), '\n');
         // process.stdout.write(' ', typeof String.raw`${message.body}`)
     }
-    process.stdout.write('now: ' + new Date().toLocaleTimeString() + '; msg_time: ' + new Date(message.timestamp).toLocaleTimeString() + '\n');
+    process.stdout.write('now: ' + new Date().toLocaleTimeString() + '; msg_time: ' + new Date(message.timestamp).toLocaleTimeString() + ' _ ');
 
-    if ([...lista_comandos].some(cmd => cmd.toLowerCase() === String.raw`${message.body}`.toLowerCase())) {
+    if ([...lista_comandos].some(cmd => String.raw`${message.body}`.toLowerCase().startsWith(cmd.toLowerCase()))) {
         setTimeout(() => {}, 4000)
         await Comandos(message);
     } else if ([...messagem_from_list].some(from => from === String.raw`${message.from}`.toLowerCase())) {
@@ -237,6 +347,8 @@ global.client.on('message_create', async message => {
         await Comandos(message);
     } else if (global.context['is_event_running_in_dragon_gakure'] && message.from === process.env.DRAGON_GAKURE) {
         await Comandos(message);
+    } else {
+        // await Comandos(message);
     }
 });
 
