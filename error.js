@@ -9,10 +9,11 @@ function error(message, code, info) {
 	const data = new Date().toLocaleDateString()
 	const dt = data + ' ' + time
 	
+	let out2 = dt + '; ' + message + '; code=' + code + '; info=' + info
+	console.error(out2)
 	let out = dt + '; ' + message.split(/\r\n|\n|\r/).join("/n"); + '; code=' + code + '; info=' + info
-	console.error(out)
 	let file_path = process.env.FILE_WITH_LOGS_DA_ARENA_SC
 	appendFile(file_path, out)
 }
 
-module.exports = error
+module.exports = { error }

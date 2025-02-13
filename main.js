@@ -5,6 +5,7 @@
 const qrcode = require('qrcode-terminal')
 const readline = require('readline')
 const { Client, LocalAuth, MessageMedia } = require('whatsapp-web.js')
+const { error } = require('./error.js')
 const { getTelefoneS } = require('./arena_sc/getTelefoneS.js')
 const { appendFile, readFile, writeFile } = require('./myfs.js') // const the functions
 const { tratar_messages_da_arena_sc } = require('./arena_sc/tratar_messages_da_arena_sc.js')
@@ -90,9 +91,18 @@ class Node {
     addChild(child) {
       this.children.push(child);
     }
+
+    serialize() {
+        const children = this.children.map(child => child.serialize());
+        return {
+          id: this.id,
+          body: this.body,
+          children: children
+        };
+      }
   
     getAllPaths(path = []) {
-      path.push(this.value);
+      path.push(this.id);
       let paths = [];
       if (this.children.length === 0) {
         paths.push([...path]);
@@ -105,19 +115,50 @@ class Node {
       return paths;
     }
   
-    search(value) {
-      if (this.value === value) {
+    search(id) {
+      if (this.id === id) {
         return this;
       }
       for (const child of this.children) {
-        const result = child.search(value);
+        const result = child.search(id);
         if (result) {
           return result;
         }
       }
       return null;
     }
-  }
+
+    getPathToId(id, path = []) {
+        path.push(this.id);
+        if (this.id === id) {
+          return path;
+        }
+        for (const child of this.children) {
+          const result = child.getPathToId(id, [...path]);
+          if (result) {
+            return result;
+          }
+        }
+        path.pop();
+        return null;
+    }
+
+
+    getPathToNode(id, path = []) {
+        path.push(this.body); // Adiciona o 'body' ao caminho
+        if (this.id === id) {
+            return path.join(' '); // Retorna o caminho como string
+        }
+        for (const child of this.children) {
+            const foundPath = child.getPathToNode(id, [...path]); // Passa uma cópia do caminho
+            if (foundPath) {
+                return foundPath;
+            }
+        }
+        path.pop(); // Remove o último elemento (backtracking)
+        return null;
+    }
+}
 
 // Função principal que rege todos os comandos
 async function Comandos(message) {
@@ -192,19 +233,18 @@ async function Comandos(message) {
                 inicio_de_historia = await get_of_open_ai('me de uma frase que inicia uma historia. somente retorne a frase que inicia a historia')
             }
             if (!global.reply) {
-                global.historia_atual= await global.reply.reply(inicio_de_historia)
+                global.historia_atual = await global.reply.reply(inicio_de_historia)
             } else if (global.reply) {
                 global.reply = await global.reply.reply(inicio_de_historia)
                 global.historia_atual = global.reply
             }
             global.context['inicio_de_historia_atual_no_evento_em_dragon_gakure'] = inicio_de_historia
+            global.context['historias_atuais_no_evento_em_dragon_gakure'] = new Node(global.historia_atual.id.id, global.historia_atual.body)
         }
         if (global.context['is_event_running_in_dragon_gakure'] && global.context['inicio_de_evento']) {
-            global.context['historias_atuais_no_evento_em_dragon_gakure'] = []
             await send_inicio_de_historia()
             global.context['inicio_de_evento'] = false
         } else if (global.context['is_event_running_in_dragon_gakure']) {
-            global.context['historias_atuais_no_evento_em_dragon_gakure'] = []
             await send_table_event_historia_continua()
             setTimeout(() => {}, 3000)
             await send_inicio_de_historia()
@@ -226,25 +266,21 @@ async function Comandos(message) {
             // IMPLEMENTAR EM ARVORE
             console.log('into event historia continua')
             console.log(message.body)
-            let msg = await message.getQuotedMessage()
-            let j = null
+            let msg_quoted = await message.getQuotedMessage()
+            let send; 
             let aux3 = global.context['historias_atuais_no_evento_em_dragon_gakure']
-            if (message.hasQuotedMsg && global.historia_atual.id.id != msg.id.id) {
-                for (let i; i < aux3.lenght; i++) {
-                    if(msg.id.id == aux3[i][aux3[i].lenght - 1]['id']) {
-                        j = i
-                        break
+            if ( message.hasQuotedMsg ) {
+                send = aux3.getPathToNode(msg_quoted.id.id)
+                if ( !send ) {
+                    if ( msg_quoted.id.id ) {// ja é diferente do inicio da historia pois se fosse igual teria `send`
+                        error(JSON.stringify({'aux3': aux3.serialize(), 'message.id': message.id.id, 'msg_quoted.id': msg_quoted.id.id}, null, 0), 1534896, 'algo nao foi encontrado na arvore do evento historia continua')
+                        return//pois se tivesse sido validado com sim, `send` estaria na arvore.
                     }
+                    error(JSON.stringify({'aux3': aux3.serialize(), 'message.id': message.id.id, 'msg_quoted.id': msg_quoted.id.id}, null, 0), 1534896, 'algo nao foi encontrado na arvore do evento historia continua')
+                    return
                 }
-            }
-            let send = ''
-            if(!j) {
-                console.log('não excluir o !j')
-                send = message.body
             } else {
-                for (let i; i < aux3[aux3.lenght - 1].lenght; i++) {
-                    send += ' ' + aux3[j][i]['body'] + '.'
-                }
+                send = global.historia_atual.body
             }
             let aux = `a frase "${message.body}" continua o início de história "${send}"? Responda com apenas "Sim" ou "Não".`
             let sim_ou_nao
@@ -257,22 +293,8 @@ async function Comandos(message) {
             console.log('sim_ou_nao =', sim_ou_nao)
             if (sim_ou_nao.toLowerCase() == 'sim.' || sim_ou_nao.toLowerCase() == 'sim') {
                 console.log('into sim')
-                if(!j) {
-                    console.log(global.historia_atual)
-                    let aux4 = [{
-                        'id': global.historia_atual.id.id,
-                        'body': global.historia_atual.body
-                    }, {
-                        'id': message.id.id,
-                        'body': message.body
-                    }]
-                    global.context['historias_atuais_no_evento_em_dragon_gakure'].push(aux4)
-                    console.log(global.context['historias_atuais_no_evento_em_dragon_gakure'])
-                } else {
-                    let aux4 = {}
-                    aux4['id'] = msg.id.id
-                    aux4['body'] = msg
-                    global.context['historias_atuais_no_evento_em_dragon_gakure'][j].push(aux4)
+                if ( message.hasQuotedMsg ) {
+                    global.context['historias_atuais_no_evento_em_dragon_gakure'].search(msg_quoted.id.id).addChild(new Node(message.id.id, message.body))
                 }
                 let ryos = JSON.parse(await readFile(process.env.RYOS_GANHOS + ' ' + global.context['sufixo_do_evento'].replace(/\D/g, '') + '.json'))
                 const dataToAppend = {
