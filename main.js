@@ -212,7 +212,6 @@ async function Comandos(message) {
         await global.client.sendMessage(group_id_dragon_gakure, dragon_gakure_events_menu);
     } else if (message.body === '1' && message.from === process.env.BOT_NUMBER && message.to === group_id_dragon_gakure) {
         console.log('into start event historia continua')
-        global.context['is_event_running_in_dragon_gakure'] = true
         const time = new Date().toLocaleTimeString()
         const data = new Date().toLocaleDateString()
         const dt = data + ' ' + time
@@ -249,6 +248,7 @@ async function Comandos(message) {
             setTimeout(() => {}, 3000)
             await send_inicio_de_historia()
         }
+        global.context['is_event_running_in_dragon_gakure'] = true
     } else if (message.body === 'end' && message.from === process.env.BOT_NUMBER && message.to === group_id_dragon_gakure) {
         console.log('1236541451')
         await send_table_event_historia_continua()
@@ -414,7 +414,7 @@ let lista_comandos = new Set(['Dg', 'Eventos', 'tag'].map(cmd => process.env.PRE
 //     process.env.DRAGON_GAKURE, process.env.OWNER_NUMBER])
 let messagem_from_list = new Set([process.env.TEST_GROUP, process.env.ARENASC, 
     process.env.OWNER_NUMBER])
-    
+
 // Bot, em loop, lendo as mensagens
 global.client.on('message_create', async message => {
 
