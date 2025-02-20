@@ -44,7 +44,6 @@ global.client.on('qr', (qr) => {
 // Function to initialize data (nicks, telefones, etc.)
 async function initializeData() {
     phoneS = await getTelefoneS()
-    global.context['historias_atuais_no_evento_em_dragon_gakure'] = null
 }
 
 initializeData()
@@ -239,9 +238,7 @@ async function Comandos(message) {
                 global.historia_atual = global.reply
             }
             global.context['inicio_de_historia_atual_no_evento_em_dragon_gakure'] = inicio_de_historia
-            if ( global.context['historias_atuais_no_evento_em_dragon_gakure'] == null ) {
-                global.context['historias_atuais_no_evento_em_dragon_gakure'] = new Node(global.historia_atual.id.id, global.historia_atual.body)
-            }
+            global.context['historias_atuais_no_evento_em_dragon_gakure'] = new Node(global.historia_atual.id.id, global.historia_atual.body)
         }
         if (global.context['is_event_running_in_dragon_gakure'] && global.context['inicio_de_evento']) {
             await send_inicio_de_historia()
@@ -258,7 +255,6 @@ async function Comandos(message) {
         global.context['is_event_running_in_dragon_gakure'] = false
         global.context['inicio_de_historia_atual_no_evento_em_dragon_gakure'] = null
         global.reply = null
-        global.context['historias_atuais_no_evento_em_dragon_gakure'] = null
     } else {
         console.log(message)
         console.log('into else of second block of ifs', '; message.from: ', message.from)
@@ -312,7 +308,6 @@ async function Comandos(message) {
                 await writeFile(process.env.RYOS_GANHOS + ' ' + global.context['sufixo_do_evento'].replace(/\D/g, '') + '.json', JSON.stringify(ryos, null, 2)); // Correctly call using await
                 console.log(global.context['historias_atuais_no_evento_em_dragon_gakure'])
             }
-        } else {
         }
         // if (process.env.DEBUG == 'true' ) {
         //     const chats = await global.client.getChats()
