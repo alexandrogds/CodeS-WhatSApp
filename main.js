@@ -238,6 +238,8 @@ async function Comandos(message) {
                 global.historia_atual = global.reply
             }
             global.context['inicio_de_historia_atual_no_evento_em_dragon_gakure'] = inicio_de_historia
+            // tem que reinciar a arvore sempre que posta novo inicio de historia
+            // pois a historia muda
             global.context['historias_atuais_no_evento_em_dragon_gakure'] = new Node(global.historia_atual.id.id, global.historia_atual.body)
         }
         if (global.context['is_event_running_in_dragon_gakure'] && global.context['inicio_de_evento']) {
