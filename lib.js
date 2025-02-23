@@ -27,4 +27,11 @@ function strip(str) {
   return str.replace(/^[\s\uFEFF\xA0]+|[\s\uFEFF\xA0]+$/g, '');
 }
 
-module.exports = { zip, removeFirst9After55, strip }
+function exists(obj) {
+	if (obj) {
+		return True
+	}
+	return False
+}
+
+module.exports = { zip, removeFirst9After55, strip, exists }

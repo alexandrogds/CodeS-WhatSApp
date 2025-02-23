@@ -11,7 +11,7 @@ const { appendFile, readFile, writeFile } = require('./myfs.js') // const the fu
 const { tratar_messages_da_arena_sc } = require('./arena_sc/tratar_messages_da_arena_sc.js')
 const { get_of_open_ai } = require('./get_of_open_ai.js')
 const { tag_mentions } = require('./tag_mentions')
-const { strip } = require('./lib.js')
+const { strip, exists } = require('./lib.js')
 const { send_file_membros_com_menções } = require('./zarcovi/send_file_membros_com_menções.js')
 
 require('dotenv').config({ path: './.env' });
@@ -65,7 +65,7 @@ async function send_table_event_historia_continua() {
             table += `\n. ${conta} +${ryosCounts[conta]}B`
         }
     });
-    global.reply = await global.reply.reply(table)
+    global.message = await global.message.reply(table)
 }
 
 function menuCLI() {
@@ -220,7 +220,7 @@ async function Comandos(message) {
         let table = strip(await readFile(process.env.HISTORIA_CONTINUA_EVENTO))
         await tag_mentions(false, false,  'EVENTO\n', message)
         setTimeout(() => {}, 3000)
-        global.reply = await global.client.sendMessage(group_id_dragon_gakure, table)
+        global.message = await global.client.sendMessage(group_id_dragon_gakure, table)
         global.context['inicio_de_evento'] = true
     } else if (message.body === '.' && message.fromMe && message.to === group_id_dragon_gakure) {
         console.log('1236544152')
@@ -231,13 +231,7 @@ async function Comandos(message) {
             } else {
                 inicio_de_historia = await get_of_open_ai('me de uma frase que inicia uma historia. somente retorne a frase que inicia a historia')
             }
-            if (!global.reply) {
-                global.historia_atual = await global.reply.reply(inicio_de_historia)
-            } else if (global.reply) {
-                global.reply = await global.reply.reply(inicio_de_historia)
-                global.historia_atual = global.reply
-            }
-            global.context['inicio_de_historia_atual_no_evento_em_dragon_gakure'] = inicio_de_historia
+			global.historia_atual = await global.message.reply(inicio_de_historia)
             // tem que reinciar a arvore sempre que posta novo inicio de historia
             // pois a historia muda
             global.context['historias_atuais_no_evento_em_dragon_gakure'] = new Node(global.historia_atual.id.id, global.historia_atual.body)
@@ -255,8 +249,7 @@ async function Comandos(message) {
         console.log('1236541451')
         await send_table_event_historia_continua()
         global.context['is_event_running_in_dragon_gakure'] = false
-        global.context['inicio_de_historia_atual_no_evento_em_dragon_gakure'] = null
-        global.reply = null
+        global.message = null
     } else {
         console.log(message)
         console.log('into else of second block of ifs', '; message.from: ', message.from)
