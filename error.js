@@ -16,4 +16,4 @@ function error(message, code, info) {
 	appendFile(file_path, out)
 }
 
-module.exports = { error }
+module.exports = error
