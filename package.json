@@ -1,7 +1,23 @@
 {
-  "name": "bot_inaters",
+  "name": "code_wpp_venom",
   "version": "1.0.0",
+  "description": "Usar de wwebjs `client.group_admin_changed()` caso eu não seja o criador do grupo ou seja criador e tenha saído. Para evitar perder o grupo.",
+  "keywords": [],
+  "homepage": "https://github.com/alexandrogds/CodeS-WhatSApp#readme",
+  "bugs": {
+    "url": "https://github.com/alexandrogds/CodeS-WhatSApp/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/alexandrogds/CodeS-WhatSApp.git"
+  },
+  "license": "MIT",
+  "author": "Alex",
+  "type": "commonjs",
   "main": "main.js",
+  "directories": {
+    "lib": "lib"
+  },
   "scripts": {
     "lint": "npx eslint",
     "test": "jest --detectOpenHandles",
@@ -9,14 +25,10 @@
     "start": "node .",
     "populate": "copy C:\\Users\\user\\(❁´◡`❁)\\.env .\\.env"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
   "dependencies": {
     "bot_inaters": "file:",
     "dotenv": "^16.4.7",
-    "openai": "^4.83.0",
+    "openai": "^4.103.0",
     "qrcode-terminal": "^0.12.0",
     "react": "^18.3.1",
     "whatsapp-web.js": "^1.26.1-alpha.3"

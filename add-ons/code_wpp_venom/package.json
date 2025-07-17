@@ -1,0 +1,16 @@
+{
+  "name": "code_wpp_venom",
+  "version": "1.0.0",
+  "description": "",
+  "license": "MIT",
+  "author": "Alex",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "puppeteer-extra-plugin-user-preferences": "^2.4.1",
+    "venom-bot": "^5.3.0"
+  }
+}

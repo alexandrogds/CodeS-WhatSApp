@@ -1,27 +1,23 @@
-# Bot WhatSApp
+# ...
+Usar de wwebjs `client.group_admin_changed()` caso eu não seja o criador do grupo ou seja criador e tenha saído. Para evitar perder o grupo.
 
-## Send msg with file content dos members DragonGakure
-Veja o prefix em .env e adicione `Dg` e envie uma mensagem no grupo de passar contatos para a Thaty. Por exemplo, se o prefixo for '.' envie `.Dg`.
+Convites url whatsapp redefinido não tem como pegaro id do grupo.
 
-## Send mensagem mentioning all members
-Veja o prefix em .env e adicione `tag` ou `hide-tag` junto com uma mensagem após um espaço e envie em um grupo. Por exemplo, se o prefixo for '.' envie `.tag msg`. A mensagem precisa ser enviada pelo número proprietário do bot.
+## Bugs a corrigir
+veja o arquivo `groupsWpp/contar grupos.py`. Há algum erro ou no calculo ou em como estou processando as urls de entradas pois os calculos não estão batendo.
 
-## Eventos DragonGakure
+Verificar se tem url repetida.
 
-### Escolher evento
-Envie `Evento` no grupo de DragonGakure com o número do Bot. E escolha algum evento digitando o número mostrado no menu de eventos.
+## Status
+Grupos de anime que não precisa aceitação já peguei os links.
 
-#### Dev
-Envie `Evento` no grupo de tests/swap. Depois selecionar o evento. e usar o número pessoal para enviar a mensagem para testar. E quando precisar 
+Falta os links de grupos que precisa aceitar para eu entrar. Apenas rodar o main.js de enterGroups que ja esta preparado para pular os grupos ja pegos e pegar os outros grupos inclusive se ja estou dentro dos grupos que precisam de aprovação para pegar os contatos.
 
-#### 📝 Evento: História Contínua 📝
-Para gerar um novo início de história enve `+` com o número do bot.
-
-## Use
+# Mensagem de erro do node que pode resultar em inabilidade de usar as lib
 ```
-npm install
-npm run start
+(node:16888) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
 ```
 
-## Why Save All Chat History não deu certo
-Por que não pegava todas as mensagens em chat.fetch e chat.syncHistory() também não funcionava
+# Documnetação
+O arquivo `metadata.db` contem as pesquisas que foram feitas no google.
